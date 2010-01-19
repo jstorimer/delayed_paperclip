@@ -15,4 +15,10 @@ class DelayedPaperclipTest < Test::Unit::TestCase
   def test_attachment_changed
     assert !@dummy.image_changed?
   end
+  
+  def test_attachment_changed_when_image_changes
+    @dummy.stubs(:image_content_type_changed?).returns(true)
+
+    assert @dummy.image_changed?
+  end
 end

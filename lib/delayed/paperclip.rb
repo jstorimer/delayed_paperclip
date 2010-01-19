@@ -39,7 +39,13 @@ module Delayed
     end
     
     module InstanceMethods
+      PAPERCLIP_ATTRIBUTES = ['_file_size', '_file_name', '_content_type', '_updated_at']
+      
       def attachment_changed?(name)
+        PAPERCLIP_ATTRIBUTES.each do |attribute|
+          return true if self.send("#{name}#{attribute}_changed?")
+        end
+        
         false
       end
     end
