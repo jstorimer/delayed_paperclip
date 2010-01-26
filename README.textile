@@ -15,6 +15,7 @@ h2. Usage
 Make sure that you have "DJ":http://github.com/tobi/delayed_job up and running.
 
 In your model:
+
 <pre><code>
   class User < ActiveRecord::Base
     has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }
@@ -24,6 +25,7 @@ In your model:
 </code></pre>
 
 In a migration (optional):
+
 <pre><code>
   class AddProcessingColumnToUser < ActiveRecord::Migration
     def self.up
