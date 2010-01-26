@@ -31,10 +31,26 @@ module Delayed
 
       def process_in_background(name)
         include InstanceMethods
-        
+
         define_method "#{name}_changed?" do
           attachment_changed?(name)
         end
+        
+        define_method "halt_processing_for_#{name}" do
+          if self.send("#{name}_changed?")
+            self.processing = true if self.respond_to?(:processing)
+            false # halts processing
+          end
+        end
+        
+        define_method "enqueue_job_for_#{name}" do
+          if self.send("#{name}_changed?")
+            Delayed::Job.enqueue DelayedPaperclipJob.new(read_attribute(:id), self.class.name, name.to_sym)
+          end
+        end
+        
+        self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
+        after_save :"enqueue_job_for_#{name}"
       end
     end
     
@@ -43,6 +59,9 @@ module Delayed
       
       def attachment_changed?(name)
         PAPERCLIP_ATTRIBUTES.each do |attribute|
+          full_attribute = "#{name}#{attribute}_changed?".to_sym
+
+          next unless self.respond_to?(full_attribute)
           return true if self.send("#{name}#{attribute}_changed?")
         end
         
