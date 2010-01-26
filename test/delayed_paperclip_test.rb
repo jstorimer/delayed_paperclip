@@ -68,8 +68,28 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     Paperclip::Attachment.any_instance.expects(:reprocess!)
     
     @dummy.save!
-    @dummy.image = File.read("#{RAILS_ROOT}/test/fixtures/12k.png")
     DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
+  end
+  
+  def test_perform_job_with_processing_attribute
+    reset_table("dummies") do |d|
+      d.string :image_file_name
+      d.integer :image_file_size
+      d.boolean :processing
+    end
+    @dummy_class = reset_class "Dummy"
+    @dummy_class.has_attached_file :image
+    @dummy_class.process_in_background :image
+    
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+
+    Paperclip::Attachment.any_instance.expects(:reprocess!)
+    
+    @dummy.processing = true
+    @dummy.save!
+    DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
+    
+    assert !@dummy.reload.processing
   end
   
   private 
