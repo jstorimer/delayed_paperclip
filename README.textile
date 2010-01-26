@@ -15,17 +15,13 @@ h2. Usage
 Make sure that you have "DJ":http://github.com/tobi/delayed_job up and running.
 
 In your model:
-<notextile>
 <pre><code>
   class User < ActiveRecord::Base
-    # Paperclip
     has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }
     
-    # delayed_paperclip
     process_in_background :avatar
   end  
 </code></pre>
-</notextile>
 
 In a migration (optional):
 <pre><code>
@@ -44,7 +40,7 @@ If you add the appropriate :processing column to your model then delayed_papercl
 
 <pre><code>
   class User < ActiveRecord::Base
-    ...
+    has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }
     
     process_in_background :avatar, :processing_image => 'public/images/no-image.png'
   end  
