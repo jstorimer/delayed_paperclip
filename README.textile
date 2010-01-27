@@ -22,8 +22,7 @@ Add it to your environment.rb:
 
 Or, even better, to your Gemfile:
 
-<pre><code>
-  source "http://gemcutter.org"
+<pre><code>source "http://gemcutter.org"
   gem 'delayed_paperclip'
 </code></pre>
 
