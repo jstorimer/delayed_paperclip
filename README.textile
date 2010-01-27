@@ -10,13 +10,26 @@ The most common use case for Paperclip is to easily attach image files to Active
 
 I'm sure that everyone knows this, this gem just makes it easy to do.
 
-h2. Install
+h2. Installation
 
-<code>sudo gem install delayed_paperclip</code>
+Install the gem:
+
+<pre><code>sudo gem install delayed_paperclip</code></pre>
+
+Add it to your environment.rb:
+
+<pre><code>config.gem 'delayed_paperclip'</code></pre>
+
+Or, even better, to your Gemfile:
+
+<pre><code>
+  source "http://gemcutter.org"
+  gem 'delayed_paperclip'
+</code></pre>
 
 Dependencies:
 * Paperclip
-* delayed_jobs
+* delayed_job
 
 h2. Usage
 
