@@ -6,9 +6,17 @@ Delayed_paperclip lets you process your "Paperclip":http://github.com/thoughtbot
 
 h2. Why?
 
-The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task.
+The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task. 
 
-That's where delayed_paperclip comes in.
+I'm sure that everyone knows this, this gem just makes it easy to do.
+
+h2. Install
+
+<code>sudo gem install delayed_paperclip</code>
+
+Dependencies:
+* Paperclip
+* delayed_jobs
 
 h2. Usage
 
@@ -24,35 +32,11 @@ In your model:
   end  
 </code></pre>
 
-In a migration (optional):
-
-<pre><code>
-  class AddProcessingColumnToUser < ActiveRecord::Migration
-    def self.up
-      add_column :users, :avatar_processing,    :boolean
-    end
-    
-    def self.down
-      remove_column :users, :avatar_processing
-    end
-  end
-</code></pre>
-
-If you add the appropriate :processing column to your model then delayed_paperclip will take care of setting that to true while your image is waiting to be processed. Delayed_paperclip will display a nice default image if someone tries to fetch an image style while it is being processed. You can also pass in a 'processing' image like so:
-
-<pre><code>
-  class User < ActiveRecord::Base
-    has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }
-    
-    process_in_background :avatar, :processing_image => 'public/images/no-image.png'
-  end  
-</code></pre>
- 
 Use your Paperclip attachment just like always in controllers and views.
 
 h2. What if I'm not using images?
 
-AFAIK this library should work no matter what kind of post-processing you are doing in Paperclip.
+AFAIK this library should work no matter what kind of post-processing you are doing with Paperclip.
 
 h2. Does it work with s3?
 
