@@ -1,7 +1,5 @@
 h1. Delayed::Paperclip
 
-*Warning: ATM this is alpha software and has not been tested in a production environment*
-
 Delayed_paperclip lets you process your "Paperclip":http://github.com/thoughtbot/paperclip attachments in a background task with "delayed_job":http://github.com/tobi/delayed_job.
 
 h2. Why?
@@ -53,7 +51,3 @@ AFAIK this library should work no matter what kind of post-processing you are do
 h2. Does it work with s3?
 
 Yes.
-
-h2. Inspirations
-
-"http://blog.madeofcode.com/post/201282903/paperclip-s3-delayed-job-in-rails":http://blog.madeofcode.com/post/201282903/paperclip-s3-delayed-job-in-rails
