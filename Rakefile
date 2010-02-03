@@ -44,7 +44,6 @@ begin
     gemspec.homepage = "http://github.com/jstorimer/delayed_paperclip"
     gemspec.authors = ["Jesse Storimer"]
     gemspec.add_dependency('paperclip', '>= 2.3.0')
-    gemspec.add_dependency('delayed_job', '>= 1.8.0')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
