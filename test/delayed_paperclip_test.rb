@@ -55,6 +55,15 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
   end
   
+  def test_after_callback_is_functional
+    @dummy_class.send(:define_method, :done_processing) { puts 'done' }
+    @dummy_class.after_image_post_process :done_processing    
+    Dummy.any_instance.expects(:done_processing)
+
+    @dummy.save!
+    DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
+  end
+  
   private 
   def reset_dummy
     reset_table("dummies") do |d|
