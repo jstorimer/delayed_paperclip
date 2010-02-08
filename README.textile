@@ -2,35 +2,33 @@ h1. Delayed::Paperclip
 
 Delayed_paperclip lets you process your "Paperclip":http://github.com/thoughtbot/paperclip attachments in a background task with "delayed_job":http://github.com/tobi/delayed_job.
 
+This is a fork that focuses on "Resque":http://github.com/defunkt/resque rather than Delayed::Job.  Everyone says that "they are both awesome":http://github.com/blog/542-introducing-resque, but, in my case, I'm already committed to using "Vanity":http://vanity.labnotes.org/ and, I'm no expert, but "redis and Vanity":http://groups.google.com/group/vanity-talk/browse_thread/thread/db6c106581a26c46/eccff9396bdb2fe8?show_docid=eccff9396bdb2fe8&fwc=1&pli=1# look like they're likely to go hand in hand for some time.  
+
 h2. Why?
 
-The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task. 
+The "original author":http://github.com/jstorimer/delayed_paperclip says:
 
-I'm sure that everyone knows this, this gem just makes it easy to do.
+bq. The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task. 
+
+bq. I'm sure that everyone knows this, this gem just makes it easy to do.
+
+I am also concerned with the "memory usage of ImageMagick":http://magick.imagemagick.org/script/architecture.php#cache and didn't want a few bad actors to be able to take down my site just by uploading some big pictures.
 
 h2. Installation
 
-Install the gem:
+Not only do I have no idea how I would enable some kind of "two gems" approach, but also I don't know what the future of this project is, necessarily.  But it does work, and maybe you'll find it useful.
 
-<pre><code>sudo gem install delayed_paperclip</code></pre>
+Install as a rails plugin:
 
-Add it to your environment.rb:
-
-<pre><code>config.gem 'delayed_paperclip'</code></pre>
-
-Or, even better, to your Gemfile:
-
-<pre><code>source "http://gemcutter.org"
-gem 'delayed_paperclip'
-</code></pre>
+<pre><code>script/plugin install git://github.com/bigfleet/delayed_paperclip.git</code></pre>
 
 Dependencies:
 * Paperclip
-* delayed_job
+* resque
 
 h2. Usage
 
-Make sure that you have "DJ":http://github.com/tobi/delayed_job up and running.
+Make sure that you have "Resque":http://github.com/defunkt/resque up and running.  The jobs will be dispatched to the <code>:paperclip</code> queue, so you can correctly dispatch your worker.  Configure resque and your worker exactly as you would otherwise.
 
 In your model:
 
