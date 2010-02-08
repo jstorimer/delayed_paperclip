@@ -2,7 +2,6 @@ require 'test/test_helper'
 
 class DelayedPaperclipTest < Test::Unit::TestCase
   def setup
-    build_delayed_jobs
     reset_dummy
   end
   
@@ -42,17 +41,17 @@ class DelayedPaperclipTest < Test::Unit::TestCase
   def test_enqueue_job_if_source_changed
     @dummy.stubs(:image_changed?).returns(true)
 
-    original_job_count = Delayed::Job.count
+    original_job_count = Resque.size(:paperclip)
     @dummy.enqueue_job_for_image
     
-    assert_equal original_job_count + 1, Delayed::Job.count
+    assert_equal original_job_count + 1, Resque.size(:paperclip)
   end
   
   def test_perform_job
     Paperclip::Attachment.any_instance.expects(:reprocess!)
     
     @dummy.save!
-    DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
+    ResquePaperclipJob.perform(@dummy.class.name, @dummy.id, :image)
   end
   
   def test_after_callback_is_functional
@@ -61,7 +60,7 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     Dummy.any_instance.expects(:done_processing)
 
     @dummy.save!
-    DelayedPaperclipJob.new(@dummy.id, @dummy.class.name, :image).perform
+    ResquePaperclipJob.perform(@dummy.class.name, @dummy.id, :image)
   end
   
   private 

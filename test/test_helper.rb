@@ -8,8 +8,8 @@ require 'active_support'
 gem 'sqlite3-ruby'
 gem 'paperclip'
 require 'paperclip'
-gem 'delayed_job'
-require 'delayed_job'
+gem 'resque'
+require 'resque'
 
 FIXTURES_DIR = File.join(File.dirname(__FILE__), "fixtures") 
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
@@ -66,19 +66,5 @@ def rebuild_class options = {}
   Dummy.class_eval do
     include Paperclip
     has_attached_file :avatar, options
-  end
-end
-
-def build_delayed_jobs
-  ActiveRecord::Base.connection.create_table :delayed_jobs, :force => true do |table|
-    table.integer  :priority, :default => 0      # Allows some jobs to jump to the front of the queue
-    table.integer  :attempts, :default => 0      # Provides for retries, but still fail eventually.
-    table.text     :handler                      # YAML-encoded string of the object that will do work
-    table.string   :last_error                   # reason for last failure (See Note below)
-    table.datetime :run_at                       # When to run. Could be Time.now for immediately, or sometime in the future.
-    table.datetime :locked_at                    # Set when a client is working on this object
-    table.datetime :failed_at                    # Set when all retries have failed (actually, by default, the record is deleted instead)
-    table.string   :locked_by                    # Who is working on this object (if locked)
-    table.timestamps
   end
 end
