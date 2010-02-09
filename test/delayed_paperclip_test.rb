@@ -1,7 +1,10 @@
 require 'test/test_helper'
+gem 'delayed_job'
+require 'delayed_job'
 
 class DelayedPaperclipTest < Test::Unit::TestCase
   def setup
+    build_delayed_jobs
     reset_dummy
   end
   
@@ -41,38 +44,25 @@ class DelayedPaperclipTest < Test::Unit::TestCase
   def test_enqueue_job_if_source_changed
     @dummy.stubs(:image_changed?).returns(true)
 
-    original_job_count = Resque.size(:paperclip)
+    original_job_count = Delayed::Job.count
     @dummy.enqueue_job_for_image
-    
-    assert_equal original_job_count + 1, Resque.size(:paperclip)
+
+    assert_equal original_job_count + 1, Delayed::Job.count
   end
-  
+
   def test_perform_job
     Paperclip::Attachment.any_instance.expects(:reprocess!)
-    
+
     @dummy.save!
-    ResquePaperclipJob.perform(@dummy.class.name, @dummy.id, :image)
+    DelayedPaperclipJob.new(@dummy.class.name, @dummy.id, :image).perform
   end
-  
+
   def test_after_callback_is_functional
     @dummy_class.send(:define_method, :done_processing) { puts 'done' }
     @dummy_class.after_image_post_process :done_processing    
     Dummy.any_instance.expects(:done_processing)
 
     @dummy.save!
-    ResquePaperclipJob.perform(@dummy.class.name, @dummy.id, :image)
-  end
-  
-  private 
-  def reset_dummy
-    reset_table("dummies") do |d|
-      d.string :image_file_name
-      d.integer :image_file_size
-    end
-    @dummy_class = reset_class "Dummy"
-    @dummy_class.has_attached_file :image
-    @dummy_class.process_in_background :image
-    
-    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    DelayedPaperclipJob.new(@dummy.class.name, @dummy.id, :image).perform
   end
 end
