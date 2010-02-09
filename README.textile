@@ -47,6 +47,7 @@ In your model:
 Use your Paperclip attachment just like always in controllers and views.
 
 h3. Resque
+
 Make sure that you have "Resque":http://github.com/defunkt/resque up and running.  The jobs will be dispatched to the <code>:paperclip</code> queue, so you can correctly dispatch your worker.  Configure resque and your worker exactly as you would otherwise.
 
 h3. DJ
