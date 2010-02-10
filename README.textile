@@ -46,9 +46,11 @@ In your model:
 
 Use your Paperclip attachment just like always in controllers and views.
 
+To select between using Resque or Delayed::Job, just install and configure your choice properly within your application, and delayed_paperclip will do the rest.  It will detect which library is loaded and make a decision about which sort of job to enqueue at that time.
+
 h3. Resque
 
-Make sure that you have "Resque":http://github.com/defunkt/resque up and running.  The jobs will be dispatched to the <code>:paperclip</code> queue, so you can correctly dispatch your worker.  Configure resque and your worker exactly as you would otherwise.
+Make sure that you have "Resque":http://github.com/defunkt/resque up and running.  The jobs will be dispatched to the <code>:paperclip</code> queue, so you can correctly dispatch your worker.  Configure resque and your workers exactly as you would otherwise.
 
 h3. DJ
 
