@@ -51,12 +51,13 @@ class DelayedPaperclipTest < Test::Unit::TestCase
   end
 
   def test_perform_job
+    @dummy.stubs(:image_changed?).returns(true)
     Paperclip::Attachment.any_instance.expects(:reprocess!)
 
     @dummy.save!
-    DelayedPaperclipJob.new(@dummy.class.name, @dummy.id, :image).perform
+    Delayed::Job.last.payload_object.perform
   end
-
+  
   def test_after_callback_is_functional
     @dummy_class.send(:define_method, :done_processing) { puts 'done' }
     @dummy_class.after_image_post_process :done_processing    

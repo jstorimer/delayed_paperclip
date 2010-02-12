@@ -21,7 +21,7 @@ module Delayed
         define_method "enqueue_job_for_#{name}" do
           if self.send("#{name}_changed?")
             if delayed_job?
-              Delayed::Job.enqueue DelayedPaperclipJob.new(read_attribute(:id), self.class.name, name.to_sym)
+              Delayed::Job.enqueue DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym)
             elsif resque?
               Resque.enqueue(ResquePaperclipJob, self.class.name, read_attribute(:id), name.to_sym)
             end
