@@ -73,3 +73,16 @@ module Delayed
     end
   end
 end
+
+module Paperclip
+  class Attachment
+    def url_with_processed style = default_style, include_updated_timestamp = true
+      if @instance.send(:"#{@name}_processed?")
+        url_without_processed style, include_updated_timestamp
+      else
+        interpolate(@default_url, style)
+      end
+    end
+    alias_method_chain :url, :processed
+  end
+end

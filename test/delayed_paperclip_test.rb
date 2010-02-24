@@ -107,4 +107,18 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     @dummy.reload
     assert @dummy.image_processed?
   end
+
+  def test_unprocessed_image_returns_missing_url
+    reset_dummy(true)
+
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    @dummy.save!
+
+    assert @dummy.image.url, "/images/original/missing.png"
+
+    Delayed::Job.first.invoke_job
+
+    @dummy.reload
+    assert @dummy.image.url, "/public/system/images/1/original/12k.png"
+  end
 end
