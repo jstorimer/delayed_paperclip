@@ -5,5 +5,6 @@ class DelayedPaperclipJob < Struct.new(:instance_klass, :instance_id, :attachmen
     instance.send(attachment_name).reprocess!
 
     instance.send("#{attachment_name}_processed!")
+    instance.save(false)
   end
 end

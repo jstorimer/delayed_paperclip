@@ -11,6 +11,8 @@ class DelayedPaperclipTest < Test::Unit::TestCase
   def test_attachment_changed
     @dummy.stubs(:image_file_size_changed?).returns(false)
     @dummy.stubs(:image_file_name_changed?).returns(false)
+    @dummy.stubs(:image_content_type_changed?).returns(false)
+    @dummy.stubs(:image_updated_at_changed?).returns(false)
 
     assert !@dummy.image_changed?
   end
@@ -75,12 +77,34 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     assert @dummy.image_processed?
   end
 
-  def test_processed_always_return_true
+  def test_processed_methods_always_return_true
     @dummy.image_processed = false
     assert @dummy.image_processed
 
     @dummy.image_processing!
     assert @dummy.image_processed
+    assert @dummy.image_processed?
+  end
+
+  def test_processed_false_when_new_image_added
+    reset_dummy(true)
+
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+
+    assert  @dummy.image_processed?
+    assert  @dummy.save!
+    assert !@dummy.image_processed?
+  end
+
+  def test_processed_true_when_delayed_jobs_completed
+    reset_dummy(true)
+
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    @dummy.save!
+
+    Delayed::Job.first.invoke_job
+
+    @dummy.reload
     assert @dummy.image_processed?
   end
 end

@@ -14,7 +14,6 @@ module Delayed
 
         define_method "halt_processing_for_#{name}" do
           if self.send("#{name}_changed?")
-            self.send("#{name}_processing!")
             false # halts processing
           end
         end
@@ -31,26 +30,22 @@ module Delayed
 
         define_method "#{name}_processing!" do
           self.send("#{name}_processed=", false)
+          true
         end
 
         define_method "#{name}_processed!" do
           self.send("#{name}_processed=", true)
         end
 
-        unless self.respond_to?("#{name}_processed")
-          define_method "#{name}_processed" do
-            true
-          end
-          define_method "#{name}_processed?" do
-            true
-          end
-          define_method "#{name}_processed=" do |arg|
-            true
-          end
+        unless self.column_names.include?("#{name}_processed")
+          define_method "#{name}_processed"  do true; end
+          define_method "#{name}_processed?" do true; end
+          define_method "#{name}_processed=" do |arg| true; end
         end
 
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
-        after_save :"enqueue_job_for_#{name}"
+        before_save :"#{name}_processing!", :if => :"#{name}_changed?"
+        after_save  :"enqueue_job_for_#{name}"
       end
     end
 
