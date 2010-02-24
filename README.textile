@@ -4,7 +4,7 @@ Delayed_paperclip lets you process your "Paperclip":http://github.com/thoughtbot
 
 h2. Why?
 
-The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task. 
+The most common use case for Paperclip is to easily attach image files to ActiveRecord models. Most of the time these image files will have multiple styles and will need to be resized when they are created. This is usually a pretty "slow operation":http://www.jstorimer.com/ruby/2010/01/05/speep-up-your-paperclip-tests.html and should be handled in a background task.
 
 I'm sure that everyone knows this, this gem just makes it easy to do.
 
@@ -39,9 +39,9 @@ In your model:
 <pre><code>
   class User < ActiveRecord::Base
     has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }
-    
+
     process_in_background :avatar
-  end  
+  end
 </code></pre>
 
 Use your Paperclip attachment just like always in controllers and views.
@@ -55,6 +55,12 @@ Make sure that you have "Resque":http://github.com/defunkt/resque up and running
 h3. DJ
 
 Just make sure that you have DJ up and running.
+
+h3. Displaying images during before processing
+
+In the default setup, when you upload an image and try to display it before the job has been completed, paperclip will be none the wiser and output the url of the image which is yet to be processed, which will result in a broken image link being displayed on the page.
+
+To have the missing image url be outputted by paperclip while the new image is being processed, all you need to do is add a #{attachment_name}_processed column to the specific model you want to enable this feature for. This feature gracefully degrades and will not affect models which do not have the column added to them.
 
 h2. What if I'm not using images?
 
