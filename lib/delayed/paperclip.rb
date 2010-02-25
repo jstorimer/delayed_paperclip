@@ -9,7 +9,7 @@ module Delayed
         include InstanceMethods
 
         define_method "#{name}_changed?" do
-          attachment_changed?(name)
+          attachment_has_changed?(name)
         end
         
         define_method "halt_processing_for_#{name}" do
@@ -36,7 +36,7 @@ module Delayed
     module InstanceMethods
       PAPERCLIP_ATTRIBUTES = ['_file_size', '_file_name', '_content_type', '_updated_at']
       
-      def attachment_changed?(name)
+      def attachment_has_changed?(name)
         PAPERCLIP_ATTRIBUTES.each do |attribute|
           full_attribute = "#{name}#{attribute}_changed?".to_sym
 
