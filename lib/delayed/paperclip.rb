@@ -28,23 +28,27 @@ module Delayed
           end
         end
 
-        define_method "#{name}_processing!" do
-          self.send("#{name}_processed=", false)
-          true
+        define_method "#{name}_requires_processing?" do
+          self.new_record? &&
+            self.send(:"#{name}_changed?") &&
+            self.respond_to?(:"#{name}_processing?")
         end
 
         define_method "#{name}_processed!" do
-          self.send("#{name}_processed=", true)
+          return true unless self.respond_to?(:"#{name}_processing?")
+          self.send("#{name}_processing=", false)
+          self.save(false)
         end
 
-        unless self.column_names.include?("#{name}_processed")
-          define_method "#{name}_processed"  do true; end
-          define_method "#{name}_processed?" do true; end
-          define_method "#{name}_processed=" do |arg| true; end
+        define_method "mark_#{name}_as_processing" do
+          self.send("#{name}_processing=", true) if self.send("#{name}_requires_processing?")
+          true
         end
+        private :"mark_#{name}_as_processing"
 
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
-        before_save :"#{name}_processing!", :if => :"#{name}_changed?"
+
+        before_save :"mark_#{name}_as_processing"
         after_save  :"enqueue_job_for_#{name}"
       end
     end
@@ -78,7 +82,7 @@ end
 module Paperclip
   class Attachment
     def url_with_processed style = default_style, include_updated_timestamp = true
-      if @instance.respond_to?(:"#{@name}_processed?") && @instance.send(:"#{@name}_processed?")
+      if @instance.respond_to?(:"#{@name}_processed") && @instance.send(:"#{@name}_processed?")
         url_without_processed style, include_updated_timestamp
       else
         interpolate(@default_url, style)

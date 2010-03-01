@@ -69,21 +69,32 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     DelayedPaperclipJob.new(@dummy.class.name, @dummy.id, :image).perform
   end
 
-  def test_processed_methods_added_if_processed_column_does_not_exist
-    assert @dummy.respond_to?(:image_processed)
-    assert @dummy.respond_to?(:image_processed=)
+  def test_processed_added_if_column_does_not_exist
     assert @dummy.respond_to?(:image_processed!)
-    assert @dummy.respond_to?(:image_processing!)
-    assert @dummy.image_processed?
   end
 
-  def test_processed_methods_always_return_true
-    @dummy.image_processed = false
-    assert @dummy.image_processed
+  def test_processed_method_returns_true_if_column_does_not_exist
+    assert @dummy.image_processed!
+  end
 
-    @dummy.image_processing!
-    assert @dummy.image_processed
-    assert @dummy.image_processed?
+  def test_image_requires_no_processing_if_column_does_not_exist
+    assert !@dummy.image_requires_processing?
+
+    @dummy.save(false)
+
+    assert !@dummy.image_requires_processing?
+  end
+
+  def test_image_requires_no_processing
+    reset_dummy(true)
+
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+
+    assert @dummy.image_requires_processing?
+
+    @dummy.save(false)
+
+    assert !@dummy.image_requires_processing?
   end
 
   def test_processed_false_when_new_image_added
@@ -91,9 +102,9 @@ class DelayedPaperclipTest < Test::Unit::TestCase
 
     @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
 
-    assert  @dummy.image_processed?
+    assert !@dummy.image_processing?
     assert  @dummy.save!
-    assert !@dummy.image_processed?
+    assert  @dummy.image_processing?
   end
 
   def test_processed_true_when_delayed_jobs_completed
@@ -105,7 +116,7 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     Delayed::Job.first.invoke_job
 
     @dummy.reload
-    assert @dummy.image_processed?
+    assert !@dummy.image_processing?
   end
 
   def test_unprocessed_image_returns_missing_url

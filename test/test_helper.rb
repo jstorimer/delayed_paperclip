@@ -52,7 +52,7 @@ def build_dummy_table(with_processed)
     t.integer  :image_file_size
     t.datetime :image_updated_at
 
-    t.boolean(:image_processed, :default => true) if with_processed
+    t.boolean(:image_processing, :default => false) if with_processed
   end
 end
 

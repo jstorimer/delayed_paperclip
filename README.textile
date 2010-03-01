@@ -58,9 +58,9 @@ Just make sure that you have DJ up and running.
 
 h3. Displaying images during before processing
 
-In the default setup, when you upload an image and try to display it before the job has been completed, paperclip will be none the wiser and output the url of the image which is yet to be processed, which will result in a broken image link being displayed on the page.
+In the default setup, when you upload an image for the first time and try to display it before the job has been completed, paperclip will be none the wiser and output the url of the image which is yet to be processed, which will result in a broken image link being displayed on the page.
 
-To have the missing image url be outputted by paperclip while the new image is being processed, all you need to do is add a #{attachment_name}_processed column to the specific model you want to enable this feature for. This feature gracefully degrades and will not affect models which do not have the column added to them.
+To have the missing image url be outputted by paperclip while the image is being processed, all you need to do is add a #{attachment_name}_processing column to the specific model you want to enable this feature for. This feature gracefully degrades and will not affect models which do not have the column added to them.
 
 h2. What if I'm not using images?
 
