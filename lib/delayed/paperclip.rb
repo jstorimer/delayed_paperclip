@@ -35,7 +35,8 @@ module Delayed
         end
 
         define_method "#{name}_processed!" do
-          return true unless self.respond_to?(:"#{name}_processing?")
+          return true unless self.respond_to?(:"#{name}_processing?") &&
+                             self.send("#{name}_processing?")
           self.send("#{name}_processing=", false)
           self.save(false)
         end
