@@ -56,11 +56,31 @@ h3. DJ
 
 Just make sure that you have DJ up and running.
 
-h3. Displaying images during before processing
+h3. Displaying images during processing
 
-In the default setup, when you upload an image for the first time and try to display it before the job has been completed, paperclip will be none the wiser and output the url of the image which is yet to be processed, which will result in a broken image link being displayed on the page.
+In the default setup, when you upload an image for the first time and try to display it before the job has been completed, Paperclip will be none the wiser and output the url of the image which is yet to be processed, which will result in a broken image link being displayed on the page.
 
 To have the missing image url be outputted by paperclip while the image is being processed, all you need to do is add a #{attachment_name}_processing column to the specific model you want to enable this feature for. This feature gracefully degrades and will not affect models which do not have the column added to them.
+
+<pre><code>
+  class AddAvatarProessingToUser < ActiveRecord::Migration
+    def self.up
+      add_column :users, :avatar_processing, :boolean
+    end
+    
+    def self.down
+      remove_column :users, :avatar_processing
+    end
+  end
+  
+  @user = User.new(:avatar => File.new(...))
+  @user.save
+  @user.avatar.url #=> "/images/original/missing.png"
+  Delayed::Job.work_off
+
+  @user.reload
+  @user.avatar.url #=> "/system/images/3/original/IMG_2772.JPG?1267562148"
+</code></pre>
 
 h2. What if I'm not using images?
 
