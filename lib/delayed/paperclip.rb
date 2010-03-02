@@ -83,10 +83,14 @@ end
 module Paperclip
   class Attachment
     def url_with_processed style = default_style, include_updated_timestamp = true
-      if @instance.column_exists?(:"#{@name}_processing") && !@instance.send(:"#{@name}_processing?")
+      if !@instance.column_exists?(:"#{@name}_processing")
         url_without_processed style, include_updated_timestamp
       else
-        interpolate(@default_url, style)
+        if !@instance.send(:"#{@name}_processing?")
+          url_without_processed style, include_updated_timestamp
+        else
+          interpolate(@default_url, style)
+        end
       end
     end
     alias_method_chain :url, :processed

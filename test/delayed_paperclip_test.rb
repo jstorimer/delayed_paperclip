@@ -103,4 +103,16 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     @dummy.reload
     assert_match(/\/system\/images\/1\/original\/12k.png/, @dummy.image.url)
   end  
+  
+  def test_original_url_when_no_processing_column
+    @dummy = reset_dummy(false)    
+    @dummy.save!
+
+    assert_match(/\/system\/images\/1\/original\/12k.png/, @dummy.image.url)
+
+    # Delayed::Job.first.invoke_job
+    # 
+    # @dummy.reload
+    # assert_match(/\/system\/images\/1\/original\/12k.png/, @dummy.image.url)
+  end    
 end
