@@ -69,67 +69,38 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     DelayedPaperclipJob.new(@dummy.class.name, @dummy.id, :image).perform
   end
 
-  def test_processed_added_if_column_does_not_exist
-    assert @dummy.respond_to?(:image_processed!)
+  def test_processed_method_returns_nil_if_column_does_not_exist
+    assert_equal nil, @dummy.image_processed!
   end
 
-  def test_processed_method_returns_true_if_column_does_not_exist
-    assert @dummy.image_processed!
-  end
-
-  def test_image_requires_no_processing_if_column_does_not_exist
-    assert !@dummy.image_requires_processing?
-
-    @dummy.save(false)
-
-    assert !@dummy.image_requires_processing?
-  end
-
-  def test_image_requires_no_processing
-    reset_dummy(true)
-
-    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
-
-    assert @dummy.image_requires_processing?
-
-    @dummy.save(false)
-
-    assert !@dummy.image_requires_processing?
-  end
-
-  def test_processed_false_when_new_image_added
-    reset_dummy(true)
-
-    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+  def test_processing_true_when_new_image_added
+    @dummy = reset_dummy(true)
 
     assert !@dummy.image_processing?
-    assert  @dummy.save!
-    assert  @dummy.image_processing?
+    assert @dummy.new_record?
+    @dummy.save!
+    assert @dummy.reload.image_processing?
   end
 
   def test_processed_true_when_delayed_jobs_completed
-    reset_dummy(true)
-
-    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    @dummy = reset_dummy(true)    
     @dummy.save!
 
-    Delayed::Job.first.invoke_job
+    Delayed::Job.work_off
 
     @dummy.reload
     assert !@dummy.image_processing?
   end
 
   def test_unprocessed_image_returns_missing_url
-    reset_dummy(true)
-
-    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    @dummy = reset_dummy(true)    
     @dummy.save!
 
-    assert @dummy.image.url, "/images/original/missing.png"
+    assert_equal "/images/original/missing.png", @dummy.image.url
 
     Delayed::Job.first.invoke_job
 
     @dummy.reload
-    assert @dummy.image.url, "/public/system/images/1/original/12k.png"
-  end
+    assert_match(/\/system\/images\/1\/original\/12k.png/, @dummy.image.url)
+  end  
 end
