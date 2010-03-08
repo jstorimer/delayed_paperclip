@@ -59,6 +59,18 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     @dummy.save!
     Delayed::Job.last.payload_object.perform
   end
+  
+  def test_processing_column_kept_intact
+    @dummy = reset_dummy(true)
+    
+    @dummy.stubs(:image_changed?).returns(true)
+    Paperclip::Attachment.any_instance.stubs(:reprocess!).raises(StandardError.new('oops'))
+
+    @dummy.save!
+    assert @dummy.image_processing?
+    Delayed::Job.work_off
+    assert @dummy.reload.image_processing?
+  end
 
   def test_after_callback_is_functional
     @dummy_class.send(:define_method, :done_processing) { puts 'done' }
@@ -110,4 +122,35 @@ class DelayedPaperclipTest < Test::Unit::TestCase
 
     assert_match(/\/system\/images\/1\/original\/12k.png/, @dummy.image.url)
   end    
+  
+  def test_original_url_if_image_changed
+    @dummy = reset_dummy(true)    
+    @dummy.image_processing!
+    @dummy.image_content_type_will_change!
+
+    assert_match(/system\/images\/.*original.*/, @dummy.image.url)
+  end
+  
+  def test_missing_url_if_image_hasnt_changed
+    @dummy = reset_dummy(true)    
+    @dummy.image_processing!
+    @dummy.stubs(:image_changed?).returns(false)
+
+    assert_match(/images\/.*missing.*/, @dummy.image.url)
+  end
+  
+  def test_attachment_processing_with_no_args
+    Dummy.any_instance.expects(:save).never
+
+    @dummy.image_processing!
+  end
+
+  def test_attachment_processing_with_args
+    Dummy.any_instance.stubs(:image_processing?).returns(true)
+    @dummy = reset_dummy(true)    
+    @dummy.image_content_type_will_change!
+    @dummy.expects(:save).with(false)
+
+    @dummy.image_processing!(:save => true)
+  end
 end

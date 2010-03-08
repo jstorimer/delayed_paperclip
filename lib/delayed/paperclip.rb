@@ -36,12 +36,17 @@ module Delayed
           self.save(false)
         end
 
-        define_method "#{name}_processing!" do
+        define_method "#{name}_processing!" do |*args|
+          force_save = args.first
           return unless column_exists?(:"#{name}_processing")
-          return if self.send(:"#{name}_processing?")
-          return unless self.send(:"#{name}_changed?")
+          
+          unless force_save
+            return if self.send(:"#{name}_processing?")
+            return unless self.send(:"#{name}_changed?")
+          end
 
           self.send("#{name}_processing=", true)
+          self.save(false) if force_save
         end
 
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
@@ -89,7 +94,11 @@ module Paperclip
         if !@instance.send(:"#{@name}_processing?")
           url_without_processed style, include_updated_timestamp
         else
-          interpolate(@default_url, style)
+          if @instance.send(:"#{@name}_changed?")
+            url_without_processed style, include_updated_timestamp
+          else
+            interpolate(@default_url, style)
+          end
         end
       end
     end

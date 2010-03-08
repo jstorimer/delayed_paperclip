@@ -7,6 +7,7 @@ class ResquePaperclipTest < Test::Unit::TestCase
     # Make sure that we just test Resque in here
     Object.send(:remove_const, :Delayed) if defined? Delayed
 
+    Resque.remove_queue(:paperclip)
     reset_dummy
   end
 
@@ -33,5 +34,20 @@ class ResquePaperclipTest < Test::Unit::TestCase
 
     @dummy.save!
     ResquePaperclipJob.perform(@dummy.class.name, @dummy.id, :image)
+  end
+  
+  def test_processing_column_kept_intact
+    @dummy = reset_dummy(true)
+    
+    @dummy.stubs(:image_changed?).returns(true)
+    Paperclip::Attachment.any_instance.stubs(:reprocess!).raises(StandardError.new('oops'))
+
+    @dummy.save!
+    assert @dummy.image_processing?
+    
+    worker = Resque::Worker.new(:paperclip)
+    worker.process
+    
+    assert @dummy.reload.image_processing?
   end
 end
