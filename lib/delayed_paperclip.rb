@@ -1,3 +1,5 @@
+require 'paperclip'
+
 require 'delayed/paperclip'
 require 'delayed/jobs/resque_paperclip_job'
 require 'delayed/jobs/delayed_paperclip_job'
