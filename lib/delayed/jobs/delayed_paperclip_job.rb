@@ -1,15 +1,19 @@
 class DelayedPaperclipJob < Struct.new(:instance_klass, :instance_id, :attachment_name)
   def perform
-    instance = instance_klass.constantize.find(instance_id)
-
-    instance.send("#{attachment_name}_processed!")
-    begin
+    process_job do
       instance.send(attachment_name).reprocess!
-    rescue Exception => e
-      instance.send("#{attachment_name}_processing!", :save => true)
-      
-      # DJ will now pickup this error and do its error handling
-      raise(e)
+      instance.send("#{attachment_name}_processed!")
     end
+  end
+  
+  private
+  def instance
+    @instance ||= instance_klass.constantize.find(instance_id)
+  end
+  
+  def process_job
+    instance.send(attachment_name).job_is_processing = true
+    yield
+    instance.send(attachment_name).job_is_processing = false    
   end
 end

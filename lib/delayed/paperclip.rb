@@ -36,17 +36,12 @@ module Delayed
           self.save(false)
         end
 
-        define_method "#{name}_processing!" do |*args|
-          force_save = args.first
+        define_method "#{name}_processing!" do
           return unless column_exists?(:"#{name}_processing")
-          
-          unless force_save
-            return if self.send(:"#{name}_processing?")
-            return unless self.send(:"#{name}_changed?")
-          end
+          return if self.send(:"#{name}_processing?")
+          return unless self.send(:"#{name}_changed?")
 
           self.send("#{name}_processing=", true)
-          self.save(false) if force_save
         end
 
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
@@ -87,7 +82,11 @@ end
 
 module Paperclip
   class Attachment
+    attr_accessor :job_is_processing
+    
     def url_with_processed style = default_style, include_updated_timestamp = true
+      return url_without_processed style, include_updated_timestamp if job_is_processing
+    
       if !@instance.column_exists?(:"#{@name}_processing")
         url_without_processed style, include_updated_timestamp
       else

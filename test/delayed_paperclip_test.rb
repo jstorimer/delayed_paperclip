@@ -138,19 +138,4 @@ class DelayedPaperclipTest < Test::Unit::TestCase
 
     assert_match(/images\/.*missing.*/, @dummy.image.url)
   end
-  
-  def test_attachment_processing_with_no_args
-    Dummy.any_instance.expects(:save).never
-
-    @dummy.image_processing!
-  end
-
-  def test_attachment_processing_with_args
-    Dummy.any_instance.stubs(:image_processing?).returns(true)
-    @dummy = reset_dummy(true)    
-    @dummy.image_content_type_will_change!
-    @dummy.expects(:save).with(false)
-
-    @dummy.image_processing!(:save => true)
-  end
 end
