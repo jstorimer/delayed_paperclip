@@ -138,4 +138,11 @@ class DelayedPaperclipTest < Test::Unit::TestCase
 
     assert_match(/images\/.*missing.*/, @dummy.image.url)
   end
+  
+  def test_should_not_blow_up_if_dsl_unused
+    reset_class "Dummy", false
+    @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+
+    assert @dummy.image.url
+  end
 end

@@ -1,6 +1,6 @@
 module Delayed
   module Paperclip
-    def self.included(base) #:nodoc:
+    def self.included(base)
       base.extend(ClassMethods)
     end
 
@@ -76,17 +76,18 @@ module Delayed
       def column_exists?(column)
         self.class.columns_hash.has_key?(column.to_s)
       end
-    end
+    end      
   end
 end
 
 module Paperclip
   class Attachment
     attr_accessor :job_is_processing
-    
+
     def url_with_processed style = default_style, include_updated_timestamp = true
+      return url_without_processed style, include_updated_timestamp unless @instance.respond_to?(:column_exists?)
       return url_without_processed style, include_updated_timestamp if job_is_processing
-    
+
       if !@instance.column_exists?(:"#{@name}_processing")
         url_without_processed style, include_updated_timestamp
       else
@@ -101,6 +102,7 @@ module Paperclip
         end
       end
     end
+    
     alias_method_chain :url, :processed
   end
 end

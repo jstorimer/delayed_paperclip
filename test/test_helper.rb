@@ -1,19 +1,7 @@
 require 'test/unit'
 require 'rubygems'
 require 'mocha'
-
 require 'active_record'
-require 'active_support'
-
-gem 'sqlite3-ruby'
-
-gem 'paperclip'
-require 'paperclip'
-
-FIXTURES_DIR = File.join(File.dirname(__FILE__), "fixtures")
-config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
-ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
-ActiveRecord::Base.establish_connection(config['test'])
 
 ROOT       = File.join(File.dirname(__FILE__), '..')
 RAILS_ROOT = ROOT
@@ -25,6 +13,16 @@ $LOAD_PATH << File.join(ROOT, 'test')
 
 require File.join(ROOT, 'lib', 'delayed_paperclip.rb')
 
+require 'active_support'
+gem 'sqlite3-ruby'
+
+gem 'paperclip'
+require 'paperclip'
+
+FIXTURES_DIR = File.join(File.dirname(__FILE__), "fixtures")
+config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
+ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
+ActiveRecord::Base.establish_connection(config['test'])
 
 def reset_dummy(with_processed = false)
   build_dummy_table(with_processed)
@@ -34,13 +32,12 @@ def reset_dummy(with_processed = false)
   @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
 end
 
-def reset_class class_name
-  ActiveRecord::Base.send(:include, Paperclip)
+def reset_class class_name, include_process = true
   Object.send(:remove_const, class_name) rescue nil
   klass = Object.const_set(class_name, Class.new(ActiveRecord::Base))
   klass.class_eval do
     has_attached_file     :image
-    process_in_background :image
+    process_in_background :image if include_process
   end
   @dummy_class = klass
 end
