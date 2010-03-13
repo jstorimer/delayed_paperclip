@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{delayed_paperclip}
-  s.version = "0.6.4"
+  s.version = "0.6.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jesse Storimer"]
-  s.date = %q{2010-03-10}
+  s.date = %q{2010-03-13}
   s.description = %q{Process your Paperclip attachments in the background with delayed_job.}
   s.email = %q{jesse@jstorimer.com}
   s.extra_rdoc_files = [
