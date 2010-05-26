@@ -33,7 +33,7 @@ module Delayed
           return unless self.send(:"#{name}_processing?")
 
           self.send("#{name}_processing=", false)
-          self.save(false)
+          self.save(:validate => false)
         end
 
         define_method "#{name}_processing!" do
@@ -53,7 +53,7 @@ module Delayed
 
     module InstanceMethods
       PAPERCLIP_ATTRIBUTES = ['_file_size', '_file_name', '_content_type', '_updated_at']
-      
+
       def attachment_has_changed?(name)
         PAPERCLIP_ATTRIBUTES.each do |attribute|
           full_attribute = "#{name}#{attribute}_changed?".to_sym
@@ -72,11 +72,11 @@ module Delayed
       def resque?
         defined? Resque
       end
-      
+
       def column_exists?(column)
         self.class.columns_hash.has_key?(column.to_s)
       end
-    end      
+    end
   end
 end
 
@@ -102,7 +102,7 @@ module Paperclip
         end
       end
     end
-    
+
     alias_method_chain :url, :processed
   end
 end
