@@ -84,7 +84,7 @@ module Paperclip
   class Attachment
     attr_accessor :job_is_processing
 
-    def url_with_processed style = default_style, include_updated_timestamp = true
+    def url_with_processed style = default_style, include_updated_timestamp = @use_timestamp
       return url_without_processed style, include_updated_timestamp unless @instance.respond_to?(:column_exists?)
       return url_without_processed style, include_updated_timestamp if job_is_processing
 
