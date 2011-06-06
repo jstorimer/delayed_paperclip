@@ -1,7 +1,7 @@
 class DelayedPaperclipJob < Struct.new(:instance_klass, :instance_id, :attachment_name, :style)
   def perform
     process_job do
-      instance.send(attachment_name).reprocess!(:style)
+      instance.send(:"#{attachment_name}").send(:reprocess!, :"#{style}")
       instance.send("#{attachment_name}_processed!")
     end
   end

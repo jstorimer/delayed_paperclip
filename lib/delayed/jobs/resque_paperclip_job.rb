@@ -5,7 +5,7 @@ class ResquePaperclipJob
     instance = instance_klass.constantize.find(instance_id)
 
     process_job(instance, attachment_name) do
-      instance.send(attachment_name).reprocess!(style)
+      instance.send(:"#{attachment_name}").send(:reprocess!, :"#{style}")
       instance.send("#{attachment_name}_processed!")
     end
   end
