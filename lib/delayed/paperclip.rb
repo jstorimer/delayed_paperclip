@@ -14,18 +14,28 @@ module Delayed
 
         define_method "halt_processing_for_#{name}" do
           return unless self.send("#{name}_changed?")
-
-          false # halts processing
+          if self.send(:id).nil?
+            false # halts processing
+          else
+            true
+          end
         end
 
         define_method "enqueue_job_for_#{name}" do
           return unless self.send("#{name}_changed?")
-
-          if delayed_job?
-            Delayed::Job.enqueue DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym)
-          elsif resque?
-            Resque.enqueue(ResquePaperclipJob, self.class.name, read_attribute(:id), name.to_sym)
+          self.send(:"#{name}").styles.each do |style_name, style|
+            other_args = style.instance_variable_get(:@other_args)
+            if other_args[:delayed]
+              if delayed_job?
+                Delayed::Job.enqueue DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym, style_name.to_sym)
+              elsif resque?
+                Resque.enqueue(ResquePaperclipJob, self.class.name, read_attribute(:id), name.to_sym, style_name.to_sym)
+              end
+            else
+              self.send(:"#{name}").send(:reprocess!, style_name.to_sym)
+            end
           end
+          true
         end
 
         define_method "#{name}_processed!" do
