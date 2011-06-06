@@ -26,13 +26,13 @@ module Delayed
           self.send(:"#{name}").styles.each do |style_name, style|
             other_args = style.instance_variable_get(:@other_args)
             if other_args[:delayed]
+              self.send(:"#{name}").send(:reprocess!, style_name.to_sym)
+            else
               if delayed_job?
                 Delayed::Job.enqueue DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym, style_name.to_sym)
               elsif resque?
                 Resque.enqueue(ResquePaperclipJob, self.class.name, read_attribute(:id), name.to_sym, style_name.to_sym)
               end
-            else
-              self.send(:"#{name}").send(:reprocess!, style_name.to_sym)
             end
           end
           true
