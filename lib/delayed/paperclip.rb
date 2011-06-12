@@ -35,7 +35,7 @@ module Delayed
               end
             end
           end
-          true
+          self.save(false)
         end
 
         define_method "#{name}_processed!" do
@@ -53,11 +53,11 @@ module Delayed
 
           self.send("#{name}_processing=", true)
         end
-
+        
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
 
-        before_save :"#{name}_processing!"
-        after_save  :"enqueue_job_for_#{name}"
+        before_create :"#{name}_processing!"
+        after_create  :"enqueue_job_for_#{name}"
       end
     end
 
