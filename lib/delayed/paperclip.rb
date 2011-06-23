@@ -28,8 +28,7 @@ module Delayed
           return if self.class::PAPERCLIP_ATTRIBUTES.map { |suff| self.send "#{name}#{suff}" }.compact.empty?
 
           if delayed_job?
-            Delayed::Worker.logger.info("[delayed_paperclip] delayed #{self.class.name}[#{read_attribute(:id)}] with priority #{priority}")
-            Delayed::Job.enqueue(DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym), priority)
+            Delayed::Job.enqueue(DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym), :priority => priority)
           elsif resque?
             Resque.enqueue(ResquePaperclipJob, self.class.name, read_attribute(:id), name.to_sym)
           end
