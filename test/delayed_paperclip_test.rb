@@ -70,7 +70,7 @@ class DelayedPaperclipTest < Test::Unit::TestCase
 
     @dummy.save!
     assert @dummy.image_processing?
-    Delayed::Job.work_off
+    Delayed::Worker.new.work_off
     assert @dummy.reload.image_processing?
   end
 
@@ -100,7 +100,7 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     @dummy = reset_dummy(true)    
     @dummy.save!
 
-    Delayed::Job.work_off
+    Delayed::Worker.new.work_off
 
     @dummy.reload
     assert !@dummy.image_processing?
