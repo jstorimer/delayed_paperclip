@@ -21,6 +21,10 @@ module Delayed
         define_method "enqueue_job_for_#{name}" do
           return unless self.send("#{name}_changed?")
 
+          # Paperclip::Attachment#queue_existing_for_delete sets paperclip
+          # attributes to nil when the record has been marked for deletion
+          return if self.class::PAPERCLIP_ATTRIBUTES.map { |suff| self.send "#{name}#{suff}" }.compact.empty?
+
           if delayed_job?
             Delayed::Job.enqueue DelayedPaperclipJob.new(self.class.name, read_attribute(:id), name.to_sym)
           elsif resque?
