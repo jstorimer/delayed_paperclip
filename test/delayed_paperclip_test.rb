@@ -1,9 +1,11 @@
 require 'test/test_helper'
-gem 'delayed_job'
 require 'delayed_job'
+Delayed::Worker.backend = :active_record
 
 class DelayedPaperclipTest < Test::Unit::TestCase
   def setup
+    super
+
     build_delayed_jobs
     reset_dummy
   end

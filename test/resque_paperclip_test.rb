@@ -4,6 +4,8 @@ require 'resque'
 
 class ResquePaperclipTest < Test::Unit::TestCase
   def setup
+    super
+
     # Make sure that we just test Resque in here
     Object.send(:remove_const, :Delayed) if defined? Delayed
 
