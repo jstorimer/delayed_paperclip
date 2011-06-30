@@ -5,8 +5,10 @@ module Delayed
     end
 
     module ClassMethods
-      def process_in_background(name)
+      def process_in_background(name, options = {})
         include InstanceMethods
+
+        priority = options.key?(:priority) ? options[:priority] : 0
 
         define_method "#{name}_changed?" do
           attachment_has_changed?(name)
@@ -23,6 +25,9 @@ module Delayed
 
         define_method "enqueue_job_for_#{name}" do
           return unless self.send("#{name}_changed?")
+          # Paperclip::Attachment#queue_existing_for_delete sets paperclip
+          # attributes to nil when the record has been marked for deletion
+          return if self.class::PAPERCLIP_ATTRIBUTES.map { |suff| self.send "#{name}#{suff}" }.compact.empty?
           self.send(:"#{name}").styles.each do |style_name, style|
             other_args = style.instance_variable_get(:@other_args)
             if other_args[:delayed] == false
@@ -43,7 +48,7 @@ module Delayed
           return unless self.send(:"#{name}_processing?")
 
           self.send("#{name}_processing=", false)
-          self.save(false)
+          self.save(:validate => false)
         end
 
         define_method "#{name}_processing!" do
@@ -63,7 +68,7 @@ module Delayed
 
     module InstanceMethods
       PAPERCLIP_ATTRIBUTES = ['_file_size', '_file_name', '_content_type', '_updated_at']
-      
+
       def attachment_has_changed?(name)
         PAPERCLIP_ATTRIBUTES.each do |attribute|
           full_attribute = "#{name}#{attribute}_changed?".to_sym
@@ -82,11 +87,11 @@ module Delayed
       def resque?
         defined? Resque
       end
-      
+
       def column_exists?(column)
         self.class.columns_hash.has_key?(column.to_s)
       end
-    end      
+    end
   end
 end
 
@@ -94,7 +99,7 @@ module Paperclip
   class Attachment
     attr_accessor :job_is_processing
 
-    def url_with_processed style = default_style, include_updated_timestamp = true
+    def url_with_processed style = default_style, include_updated_timestamp = @use_timestamp
       return url_without_processed style, include_updated_timestamp unless @instance.respond_to?(:column_exists?)
       return url_without_processed style, include_updated_timestamp if job_is_processing
 
@@ -112,7 +117,7 @@ module Paperclip
         end
       end
     end
-    
+
     alias_method_chain :url, :processed
   end
 end

@@ -1,23 +1,25 @@
-require 'test/unit'
 require 'rubygems'
+require 'test/unit'
 require 'mocha'
 require 'active_record'
+require 'logger'
+require 'sqlite3'
+require 'paperclip/railtie'
+Paperclip::Railtie.insert
 
 ROOT       = File.join(File.dirname(__FILE__), '..')
 RAILS_ROOT = ROOT
-RAILS_ENV  = "test"
-
 $LOAD_PATH << File.join(ROOT, 'lib')
-$LOAD_PATH << File.join(ROOT, 'lib', 'delayed', 'paperclip')
-$LOAD_PATH << File.join(ROOT, 'test')
 
-require File.join(ROOT, 'lib', 'delayed_paperclip.rb')
+require 'delayed_paperclip'
 
-require 'active_support'
-gem 'sqlite3-ruby'
-
-gem 'paperclip'
-require 'paperclip'
+class Test::Unit::TestCase
+  def setup
+    silence_warnings do
+      Object.const_set(:Rails, stub('Rails', :root => ROOT, :env => 'test'))
+    end
+  end
+end
 
 FIXTURES_DIR = File.join(File.dirname(__FILE__), "fixtures")
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
@@ -29,7 +31,7 @@ def reset_dummy(with_processed = false)
 
   reset_class "Dummy"
 
-  @dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+  @dummy = Dummy.new(:image => File.open("#{ROOT}/test/fixtures/12k.png"))
 end
 
 def reset_class class_name, include_process = true

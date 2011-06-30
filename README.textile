@@ -89,3 +89,7 @@ AFAIK this library should work no matter what kind of post-processing you are do
 h2. Does it work with s3?
 
 Yes.
+
+h2. Contributing
+
+Checkout out CONTRIBUTING for more info.
