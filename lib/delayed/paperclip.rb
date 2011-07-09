@@ -16,7 +16,7 @@ module Delayed
 
         define_method "halt_processing_for_#{name}" do
           return unless self.send("#{name}_changed?")
-          if self.send(:id).nil?
+          if new_record?
             false # halts processing
           else
             true
