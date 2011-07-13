@@ -53,7 +53,7 @@ module Delayed
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
 
         before_save :"#{name}_processing!"
-        after_save  :"enqueue_job_for_#{name}"
+        after_commit :"enqueue_job_for_#{name}"
       end
     end
 
