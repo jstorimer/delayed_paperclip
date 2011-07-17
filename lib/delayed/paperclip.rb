@@ -53,7 +53,11 @@ module Delayed
         self.send("before_#{name}_post_process", :"halt_processing_for_#{name}")
 
         before_save :"#{name}_processing!"
-        after_save  :"enqueue_job_for_#{name}"
+        if respond_to? :after_commit
+          after_commit :"enqueue_job_for_#{name}"
+        else
+          after_save :"enqueue_job_for_#{name}"
+        end
       end
     end
 
