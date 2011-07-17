@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'paperclip', ["~> 2.3.0"]
 
   s.add_development_dependency 'mocha'
-  s.add_development_dependency 'activerecord'
   s.add_development_dependency 'sqlite3-ruby'
   s.add_development_dependency 'delayed_job'
   s.add_development_dependency 'resque'
