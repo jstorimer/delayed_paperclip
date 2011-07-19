@@ -10,7 +10,7 @@ module DelayedPaperclip
       end
 
       def perform
-        DelayedPaperclip::Jobs::Base.process_job(instance_klass, instance_id, attachment_name)
+        DelayedPaperclip.process_job(instance_klass, instance_id, attachment_name)
       end
     end
   end

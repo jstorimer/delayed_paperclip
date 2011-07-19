@@ -1,7 +1,6 @@
 require 'paperclip'
 
 require 'delayed_paperclip'
-require 'delayed_paperclip/jobs/base'
 require 'delayed_paperclip/jobs/delayed_job'
 require 'delayed_paperclip/jobs/resque'
 
@@ -26,6 +25,12 @@ module DelayedPaperclip
 
     def enqueue(instance_klass, instance_id, attachment_name)
       processor.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name)
+    end
+
+    def process_job(instance_klass, instance_id, attachment_name)
+      instance_klass.constantize.find(instance_id)
+      .send(attachment_name)
+      .process_delayed!
     end
 
   end
