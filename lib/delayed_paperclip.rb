@@ -44,8 +44,8 @@ module DelayedPaperclip
     def process_in_background(name, options = {})
       include InstanceMethods
 
-      attachment_definitions[name][:delayed] = true
-      attachment_definitions[name][:delayed_priority] = options.key?(:priority) ? options[:priority] : 0
+      attachment_definitions[name][:delayed] = {}
+      attachment_definitions[name][:delayed][:priority] = options.key?(:priority) ? options[:priority] : 0
 
       if respond_to?(:after_commit)
         after_commit  :enqueue_delayed_processing
