@@ -1,4 +1,4 @@
-require File.expand_path './test/test_helper'
+require 'test_helper'
 require 'delayed_job'
 Delayed::Worker.backend = :active_record
 
