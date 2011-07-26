@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{delayed_paperclip}
-  s.version = "0.6.5"
+  s.version = "0.7.0"
 
   s.authors = ["Jesse Storimer", "Bert Goethals"]
   s.summary = %q{Process your Paperclip attachments in the background.}
