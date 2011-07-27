@@ -106,7 +106,7 @@ module Paperclip
     def save_with_prepare_enqueueing
       was_dirty = @dirty
       save_without_prepare_enqueueing.tap do
-        if was_dirty
+        if delay_processing? && was_dirty
           instance.prepare_enqueueing_for name
         end
       end
@@ -131,6 +131,10 @@ module Paperclip
       end
     end
     alias_method_chain :url, :processed
+
+    def delay_processing?
+      !!@instance.class.attachment_definitions[@name][:delayed]
+    end
 
     def processing?
       @instance.send(:"#{@name}_processing?")

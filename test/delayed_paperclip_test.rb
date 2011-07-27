@@ -10,6 +10,35 @@ class DelayedPaperclipTest < Test::Unit::TestCase
     reset_dummy
   end
 
+  def test_normal_paperclip_functioning
+    build_dummy_table(false)
+    reset_class "Dummy", false
+
+    Paperclip::Attachment.any_instance.expects(:post_process)
+
+    dummy = Dummy.new(:image => File.open("#{ROOT}/test/fixtures/12k.png"))
+
+    assert !dummy.image.delay_processing?
+    assert dummy.image.post_processing
+    assert dummy.save
+    assert File.exists?(dummy.image.path)
+  end
+
+  def test_delayed_paperclip_functioning
+    build_dummy_table(false)
+    reset_class "Dummy", true
+
+    Paperclip::Attachment.any_instance.expects(:post_process).never
+
+    dummy = Dummy.new(:image => File.open("#{ROOT}/test/fixtures/12k.png"))
+
+    assert dummy.image.delay_processing?
+    assert !dummy.image.post_processing
+    assert dummy.save
+    assert File.exists?(dummy.image.path)
+  end
+
+
   def test_enqueue_job_if_source_changed
     @dummy.image = File.open("#{RAILS_ROOT}/test/fixtures/12k.png")
 
