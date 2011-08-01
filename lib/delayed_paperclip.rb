@@ -67,7 +67,11 @@ module DelayedPaperclip
           processing << name
         end
       end
-      self.class.update_all(processing.collect{|n| "#{n}_processing = 1" }.join(", "), "id = #{self.id}") unless processing.empty?
+      unless processing.empty?
+        updates = processing.collect{|n| "#{n}_processing = :true" }.join(", ")
+        updates = ActiveRecord::Base.send(:sanitize_sql_array, [updates, {:true => true}])
+        self.class.update_all(updates, "id = #{self.id}")
+      end
     end
 
     # First mark processing
