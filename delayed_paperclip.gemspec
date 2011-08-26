@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
 
-  s.add_runtime_dependency 'paperclip', ["~> 2.3.0"]
+  s.add_runtime_dependency 'paperclip', ["~> 2.3.9"]
 
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'sqlite3-ruby'
