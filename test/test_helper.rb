@@ -41,6 +41,7 @@ def reset_class class_name, include_process = true
     has_attached_file     :image
     process_in_background :image if include_process
   end
+  klass.reset_column_information
   @dummy_class = klass
 end
 
