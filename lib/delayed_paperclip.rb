@@ -144,11 +144,16 @@ module Paperclip
     end
 
     def process_delayed!
-      job_is_processing = true
+      self.job_is_processing = true
       reprocess!
-      job_is_processing = false
-      instance.update_attribute("#{name}_processing", false) if instance.attributes.has_key? "#{name}_processing"
+      self.job_is_processing = false
     end
+
+    def post_process_styles_with_processing(*args)
+      post_process_styles_without_processing(*args)
+      instance.update_attribute("#{name}_processing", false) if instance.respond_to?(:"#{name}_processing?")
+    end
+    alias_method_chain :post_process_styles, :processing
 
   end
 end
