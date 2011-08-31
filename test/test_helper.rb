@@ -26,24 +26,15 @@ config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config['test'])
 
-def reset_dummy(with_processed = false)
-  build_dummy_table(with_processed)
+# def reset_dummy(options = {})
+#   reset_dummy(options)
+#   Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+# end
 
-  reset_class "Dummy"
-
-  @dummy = Dummy.new(:image => File.open("#{ROOT}/test/fixtures/12k.png"))
-end
-
-def reset_class class_name, include_process = true
-  Object.send(:remove_const, class_name) rescue nil
-  klass = Object.const_set(class_name, Class.new(ActiveRecord::Base))
-  klass.class_eval do
-    include Paperclip::Glue
-    has_attached_file     :image
-    process_in_background :image if include_process
-  end
-  klass.reset_column_information
-  @dummy_class = klass
+def reset_dummy(options = {})
+  options[:with_processed] = true unless options.key?(:with_processed)
+  build_dummy_table(options[:with_processed])
+  reset_class("Dummy", options)
 end
 
 def build_dummy_table(with_processed)
@@ -56,16 +47,15 @@ def build_dummy_table(with_processed)
   end
 end
 
-def build_delayed_jobs
-  ActiveRecord::Base.connection.create_table :delayed_jobs, :force => true do |table|
-    table.integer  :priority, :default => 0      # Allows some jobs to jump to the front of the queue
-    table.integer  :attempts, :default => 0      # Provides for retries, but still fail eventually.
-    table.text     :handler                      # YAML-encoded string of the object that will do work
-    table.string   :last_error                   # reason for last failure (See Note below)
-    table.datetime :run_at                       # When to run. Could be Time.now for immediately, or sometime in the future.
-    table.datetime :locked_at                    # Set when a client is working on this object
-    table.datetime :failed_at                    # Set when all retries have failed (actually, by default, the record is deleted instead)
-    table.string   :locked_by                    # Who is working on this object (if locked)
-    table.timestamps
+def reset_class(class_name, options)
+  ActiveRecord::Base.send(:include, Paperclip::Glue)
+  Object.send(:remove_const, class_name) rescue nil
+  klass = Object.const_set(class_name, Class.new(ActiveRecord::Base))
+  klass.class_eval do
+    include Paperclip::Glue
+    has_attached_file     :image
+    process_in_background :image, options if options[:with_processed]
   end
+  klass.reset_column_information
+  klass
 end

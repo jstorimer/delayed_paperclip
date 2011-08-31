@@ -22,10 +22,11 @@ class ResquePaperclipTest < Test::Unit::TestCase
   end
 
   def test_perform_job
-    @dummy.image = File.open("#{RAILS_ROOT}/test/fixtures/12k.png")
+    dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    dummy.image = File.open("#{RAILS_ROOT}/test/fixtures/12k.png")
     Paperclip::Attachment.any_instance.expects(:reprocess!)
-    @dummy.save!
-    DelayedPaperclip::Jobs::Resque.perform(@dummy.class.name, @dummy.id, :image)
+    dummy.save!
+    DelayedPaperclip::Jobs::Resque.perform(dummy.class.name, dummy.id, :image)
   end
 
 end
