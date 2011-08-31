@@ -84,7 +84,7 @@ To have the missing image url be outputted by paperclip while the image is being
 
 h2. What if I'm not using images?
 
-AFAIK this library should work no matter what kind of post-processing you are doing with Paperclip.
+This library works no matter what kind of post-processing you are doing with Paperclip.
 
 h2. Does it work with s3?
 
