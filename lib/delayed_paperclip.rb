@@ -9,7 +9,7 @@ module DelayedPaperclip
   class << self
 
     def options
-      options ||= {
+      @options ||= {
         :background_job_class => detect_background_task
       }
     end
