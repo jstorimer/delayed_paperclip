@@ -6,7 +6,7 @@ Commit bit. If you have a commit accepted into the project then you get full git
 Testing
 ======
 
-Please don't commit code without tests. You can bootstrap the development environment by running `bundle install`. After that, running `rake test` should just work. If it doesn't then file a bug.
+Please don't commit code without tests. You can bootstrap the development environment by running `bundle install`. After that, running `rake` should just work. If it doesn't then file a bug.
 
 Versioning
 =========
