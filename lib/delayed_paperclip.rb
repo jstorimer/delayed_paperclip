@@ -10,7 +10,8 @@ module DelayedPaperclip
 
     def options
       @options ||= {
-        :background_job_class => detect_background_task
+        :background_job_class => detect_background_task,
+        :url_with_processing  => true
       }
     end
 
@@ -45,7 +46,12 @@ module DelayedPaperclip
       include InstanceMethods
 
       attachment_definitions[name][:delayed] = {}
-      attachment_definitions[name][:delayed][:priority] = options.key?(:priority) ? options[:priority] : 0
+      {
+        :priority => 0,
+        :url_with_processing => DelayedPaperclip.options[:url_with_processing]
+      }.each do |option, default|
+        attachment_definitions[name][:delayed][option] = options.key?(option) ? options[option] : default
+      end
 
       if respond_to?(:after_commit)
         after_commit  :enqueue_delayed_processing
@@ -117,7 +123,7 @@ module Paperclip
     alias_method_chain :save, :prepare_enqueueing
 
     def url_with_processed style = default_style, include_updated_timestamp = @use_timestamp
-      return url_without_processed style, include_updated_timestamp if job_is_processing
+      return url_without_processed style, include_updated_timestamp if !@instance.class.attachment_definitions[@name][:delayed].try(:[], :url_with_processing) || job_is_processing
 
       if !@instance.respond_to?(:"#{name}_processing?")
         url_without_processed style, include_updated_timestamp
