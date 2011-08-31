@@ -38,6 +38,7 @@ def reset_class class_name, include_process = true
   Object.send(:remove_const, class_name) rescue nil
   klass = Object.const_set(class_name, Class.new(ActiveRecord::Base))
   klass.class_eval do
+    include Paperclip::Glue
     has_attached_file     :image
     process_in_background :image if include_process
   end
@@ -46,12 +47,11 @@ def reset_class class_name, include_process = true
 end
 
 def build_dummy_table(with_processed)
-  ActiveRecord::Base.connection.create_table :dummies, { :force => true } do |t|
+  ActiveRecord::Base.connection.create_table :dummies, :force => true do |t|
     t.string   :image_file_name
     t.string   :image_content_type
     t.integer  :image_file_size
     t.datetime :image_updated_at
-
     t.boolean(:image_processing, :default => false) if with_processed
   end
 end
