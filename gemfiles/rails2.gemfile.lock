@@ -19,6 +19,7 @@ GEM
     delayed_job (2.0.7)
       activesupport (~> 2.0)
       daemons (= 1.0.10)
+    json (1.6.1)
     metaclass (0.0.1)
     mime-types (1.16)
     mocha (0.10.0)
@@ -60,6 +61,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   delayed_job
+  json
   mocha
   paperclip
   rails (~> 2.3.14)
