@@ -1,4 +1,4 @@
-h1. Delayed::Paperclip
+h1. Delayed::Paperclip !https://secure.travis-ci.org/jstorimer/delayed_paperclip.png!
 
 Delayed_paperclip lets you process your "Paperclip":http://github.com/thoughtbot/paperclip attachments in a background task with "delayed_job":http://github.com/tobi/delayed_job or "Resque":http://github.com/defunkt/resque.
 
