@@ -8,5 +8,5 @@ gem "mocha"
 gem "sqlite3"
 gem "delayed_job", :require=>false
 gem "resque", :require=>false
-gem "rails", "~> 2.3.12"
+gem "rails", "~> 2.3.14"
 

@@ -51,7 +51,7 @@ GEM
     mocha (0.10.0)
       metaclass (~> 0.0.1)
     multi_json (1.0.3)
-    paperclip (2.4.1)
+    paperclip (2.3.16)
       activerecord (>= 2.3.0)
       activesupport (>= 2.3.2)
       cocaine (>= 0.0.2)
@@ -106,7 +106,7 @@ DEPENDENCIES
   appraisal
   delayed_job
   mocha
-  paperclip
+  paperclip (~> 2.3.16)
   rails (~> 3.0.10)
   resque
   sqlite3
