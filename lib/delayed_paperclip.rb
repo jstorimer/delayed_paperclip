@@ -1,6 +1,7 @@
 require 'paperclip'
 
 require 'delayed_paperclip'
+require 'delayed_paperclip/paperclip'
 require 'delayed_paperclip/jobs/delayed_job'
 require 'delayed_paperclip/jobs/resque'
 
