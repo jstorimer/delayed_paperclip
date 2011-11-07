@@ -2,13 +2,13 @@
 
 source "http://rubygems.org"
 
-gem "paperclip", "2.4.0"
+gem "paperclip", "2.4.1"
 gem "appraisal"
 gem "mocha"
 gem "sqlite3"
 gem "delayed_job", :require=>false
 gem "resque", :require=>false
 gem "json", :platforms=>:ruby_18
-gem "rails", "~> 2.3.12"
+gem "rails", "~> 2.3.14"
 
 gemspec :path=>"../"
