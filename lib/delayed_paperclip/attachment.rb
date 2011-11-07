@@ -53,7 +53,7 @@ module DelayedPaperclip
         end
       end
 
-      def url_with_processed style = default_style, include_updated_timestamp = @use_timestamp
+      def url_with_processed style = default_style, include_updated_timestamp = @options.use_timestamp
         return url_without_processed style, include_updated_timestamp if !@instance.class.attachment_definitions[@name][:delayed].try(:[], :url_with_processing) || job_is_processing
 
         if !@instance.respond_to?(:"#{name}_processing?")
@@ -65,7 +65,8 @@ module DelayedPaperclip
             if dirty?
               url_without_processed style, include_updated_timestamp
             else
-              interpolate(@default_url, style)
+              default_url = @options.default_url.is_a?(Proc) ? @options.default_url.call(self) : @options.default_url
+              interpolate(default_url, style)
             end
           end
         end
