@@ -1,6 +1,9 @@
 source "http://rubygems.org"
 
-gem "paperclip"
+gemspec
+
+gem "paperclip", '2.4.0'
+
 gem "appraisal"
 gem "mocha"
 gem "sqlite3"
