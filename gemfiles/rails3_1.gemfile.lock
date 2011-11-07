@@ -2,7 +2,7 @@ PATH
   remote: /Users/bertg/Development/delayed_paperclip
   specs:
     delayed_paperclip (0.7.2)
-      paperclip (>= 2.4.3)
+      paperclip (>= 2.4.4)
 
 GEM
   remote: http://rubygems.org/
@@ -58,7 +58,7 @@ GEM
     mocha (0.10.0)
       metaclass (~> 0.0.1)
     multi_json (1.0.3)
-    paperclip (2.4.3)
+    paperclip (2.4.4)
       activerecord (>= 2.3.0)
       activesupport (>= 2.3.2)
       cocaine (>= 0.0.2)
@@ -128,7 +128,7 @@ DEPENDENCIES
   delayed_paperclip!
   json
   mocha
-  paperclip (= 2.4.3)
+  paperclip (= 2.4.4)
   rails (~> 3.1.0)
   resque
   sqlite3
