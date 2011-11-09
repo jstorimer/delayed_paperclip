@@ -1,10 +1,15 @@
 require 'paperclip'
 
 require 'delayed_paperclip'
-require 'delayed_paperclip/jobs/delayed_job'
-require 'delayed_paperclip/jobs/resque'
 
 module DelayedPaperclip
+
+  module Jobs
+
+    autoload :DelayedJob, 'delayed_paperclip/jobs/delayed_job'
+    autoload :Resque, 'delayed_paperclip/jobs/resque'
+
+  end
 
   class << self
 

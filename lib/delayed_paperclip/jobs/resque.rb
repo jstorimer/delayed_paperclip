@@ -1,3 +1,5 @@
+require 'resque'
+
 module DelayedPaperclip
   module Jobs
     class Resque
