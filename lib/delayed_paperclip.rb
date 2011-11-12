@@ -33,8 +33,10 @@ module DelayedPaperclip
 
   end
 
-  def self.included(base)
-    base.extend(ClassMethods)
+  module Glue
+    def self.included base #:nodoc:
+      base.extend(ClassMethods)
+    end
   end
 
   module ClassMethods

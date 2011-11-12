@@ -14,7 +14,7 @@ module DelayedPaperclip
 
   class Railtie
     def self.insert
-      ActiveRecord::Base.send(:include, DelayedPaperclip)
+      ActiveRecord::Base.send(:include, DelayedPaperclip::Glue)
       Paperclip::Attachment.send :include, DelayedPaperclip::Attachment
     end
   end
