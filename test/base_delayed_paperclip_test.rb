@@ -73,7 +73,7 @@ module BaseDelayedPaperclipTest
   def test_unprocessed_image_returns_missing_url
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
-    assert_equal "/images/original/missing.png", dummy.image.url
+    assert_equal "/images/original/missing.png", dummy.image.url(:original, :timestamp => false)
     process_jobs
     dummy.reload
     assert_match /\/system\/images\/1\/original\/12k.png/, dummy.image.url
@@ -112,7 +112,7 @@ module BaseDelayedPaperclipTest
     dummy.save!
     dummy.image = File.open("#{RAILS_ROOT}/test/fixtures/12k.png")
     dummy.save!
-    assert_equal '/images/original/missing.png', dummy.image.url
+    assert_equal '/images/original/missing.png', dummy.image.url(:original, :timestamp => false)
     process_jobs
     assert_match(/system\/images\/.*original.*/, dummy.reload.image.url)
   end

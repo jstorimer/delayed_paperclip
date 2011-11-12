@@ -7,7 +7,7 @@ module DelayedPaperclip
       base.alias_method_chain :post_processing, :delay
       base.alias_method_chain :post_processing=, :delay
       base.alias_method_chain :save, :prepare_enqueueing
-      base.alias_method_chain :url, :processed
+      base.alias_method_chain :most_appropriate_url, :processed
       base.alias_method_chain :post_process_styles, :processing
     end
 
@@ -21,9 +21,13 @@ module DelayedPaperclip
         @post_processing_with_delay = value
       end
 
+      def delayed_options
+        @instance.class.attachment_definitions[@name][:delayed]
+      end
+
       def delay_processing?
         if @post_processing_with_delay.nil?
-          !!@instance.class.attachment_definitions[@name][:delayed]
+          !!delayed_options
         else
            !@post_processing_with_delay
         end
@@ -53,23 +57,16 @@ module DelayedPaperclip
         end
       end
 
-      def url_with_processed style = default_style, include_updated_timestamp = @options.use_timestamp
-        return url_without_processed style, include_updated_timestamp if !@instance.class.attachment_definitions[@name][:delayed].try(:[], :url_with_processing) || job_is_processing
-
-        if !@instance.respond_to?(:"#{name}_processing?")
-          url_without_processed style, include_updated_timestamp
+      def most_appropriate_url_with_processed
+        if original_filename.nil? || delayed_default_url?
+          default_url
         else
-          if !processing?
-            url_without_processed style, include_updated_timestamp
-          else
-            if dirty?
-              url_without_processed style, include_updated_timestamp
-            else
-              default_url = @options.default_url.is_a?(Proc) ? @options.default_url.call(self) : @options.default_url
-              interpolate(default_url, style)
-            end
-          end
+          @options.url
         end
+      end
+
+      def delayed_default_url?
+        !(job_is_processing || dirty? || !delayed_options.try(:[], :url_with_processing) || !(@instance.respond_to?(:"#{name}_processing?") && processing?))
       end
 
     end
