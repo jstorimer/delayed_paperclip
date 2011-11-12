@@ -5,6 +5,7 @@ module DelayedPaperclip
       base.send :include, InstanceMethods
       base.send :attr_accessor, :job_is_processing
       base.alias_method_chain :post_processing, :delay
+      base.alias_method_chain :post_processing=, :delay
       base.alias_method_chain :save, :prepare_enqueueing
       base.alias_method_chain :url, :processed
       base.alias_method_chain :post_process_styles, :processing
@@ -16,8 +17,16 @@ module DelayedPaperclip
         !delay_processing?
       end
 
+      def post_processing_with_delay=(value)
+        @post_processing_with_delay = value
+      end
+
       def delay_processing?
-        !!@instance.class.attachment_definitions[@name][:delayed]
+        if @post_processing_with_delay.nil?
+          !!@instance.class.attachment_definitions[@name][:delayed]
+        else
+           !@post_processing_with_delay
+        end
       end
 
       def processing?

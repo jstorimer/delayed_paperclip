@@ -15,6 +15,16 @@ module BaseDelayedPaperclipTest
     assert File.exists?(dummy.image.path)
   end
 
+  def test_normal_explisit_post_processing_with_delayed_paperclip
+    reset_dummy :with_processed => true
+    dummy = Dummy.new(:image => File.open("#{ROOT}/test/fixtures/12k.png"))
+    dummy.image.post_processing = true
+    assert !dummy.image.delay_processing?
+    assert dummy.image.post_processing, "Post processing should return true"
+    assert dummy.save
+    assert File.exists?(dummy.image.path)
+  end
+
   def test_delayed_paperclip_functioning
     build_dummy_table(false)
     reset_class "Dummy", :with_processed => true
