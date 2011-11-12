@@ -1,15 +1,6 @@
-require 'paperclip'
-
-require 'delayed_paperclip'
+require 'delayed_paperclip/jobs'
 
 module DelayedPaperclip
-
-  module Jobs
-
-    autoload :DelayedJob, 'delayed_paperclip/jobs/delayed_job'
-    autoload :Resque, 'delayed_paperclip/jobs/resque'
-
-  end
 
   class << self
 
@@ -169,7 +160,3 @@ module Paperclip
   end
 end
 
-
-if Object.const_defined?("ActiveRecord")
-  ActiveRecord::Base.send(:include, DelayedPaperclip)
-end

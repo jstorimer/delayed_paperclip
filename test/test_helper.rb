@@ -11,7 +11,8 @@ ROOT       = File.join(File.dirname(__FILE__), '..')
 RAILS_ROOT = ROOT
 $LOAD_PATH << File.join(ROOT, 'lib')
 
-require 'delayed_paperclip'
+require 'delayed_paperclip/railtie'
+DelayedPaperclip::Railtie.insert
 
 class Test::Unit::TestCase
   def setup

@@ -1,1 +1,2 @@
-require 'delayed_paperclip'
+require 'delayed_paperclip/railtie'
+DelayedPaperclip::Railtie.insert
