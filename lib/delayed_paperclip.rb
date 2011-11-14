@@ -1,5 +1,6 @@
 require 'delayed_paperclip/jobs'
 require 'delayed_paperclip/attachment'
+require 'delayed_paperclip/railtie'
 
 module DelayedPaperclip
 

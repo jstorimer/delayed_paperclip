@@ -1,3 +1,4 @@
+require 'paperclip'
 require 'delayed_paperclip'
 
 module DelayedPaperclip
@@ -5,7 +6,7 @@ module DelayedPaperclip
     require 'rails'
     class Railtie < Rails::Railtie
       initializer 'delayed_paperclip.insert_into_active_record' do
-        ActiveSupport.on_load :paperclip do
+        ActiveSupport.on_load :active_record do
           DelayedPaperclip::Railtie.insert
         end
       end
@@ -15,7 +16,7 @@ module DelayedPaperclip
   class Railtie
     def self.insert
       ActiveRecord::Base.send(:include, DelayedPaperclip::Glue)
-      Paperclip::Attachment.send :include, DelayedPaperclip::Attachment
+      Paperclip::Attachment.send(:include, DelayedPaperclip::Attachment)
     end
   end
 end
