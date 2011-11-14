@@ -1,7 +1,7 @@
 PATH
   remote: /Users/bertg/Development/delayed_paperclip
   specs:
-    delayed_paperclip (0.7.2)
+    delayed_paperclip (2.4.5.0)
       paperclip (>= 2.4.5)
 
 GEM
