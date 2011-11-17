@@ -41,6 +41,7 @@ end
 
 def build_dummy_table(with_processed)
   ActiveRecord::Base.connection.create_table :dummies, :force => true do |t|
+    t.string   :name
     t.string   :image_file_name
     t.string   :image_content_type
     t.integer  :image_file_size
@@ -57,6 +58,11 @@ def reset_class(class_name, options)
     include Paperclip::Glue
     has_attached_file     :image
     process_in_background :image, options if options[:with_processed]
+    after_update :reprocess if options[:with_after_update_callback]
+
+    def reprocess
+      image.reprocess!
+    end
   end
   klass.reset_column_information
   klass

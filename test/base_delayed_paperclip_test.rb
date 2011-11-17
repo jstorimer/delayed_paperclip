@@ -137,4 +137,14 @@ module BaseDelayedPaperclipTest
     dummy.save!
     process_jobs
   end
+
+  def test_delayed_paperclip_functioning_with_after_update_callback
+    reset_class "Dummy", :with_processed => true, :with_after_update_callback => true
+    Dummy.any_instance.expects(:reprocess)
+    dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    dummy.save!
+    process_jobs
+    dummy.update_attributes(:name => "hi")
+  end
+
 end
