@@ -76,7 +76,7 @@ To have the missing image url be outputted by paperclip while the image is being
   @user = User.new(:avatar => File.new(...))
   @user.save
   @user.avatar.url #=> "/images/original/missing.png"
-  Delayed::Job.work_off
+  Delayed::Worker.new.work_off
 
   @user.reload
   @user.avatar.url #=> "/system/images/3/original/IMG_2772.JPG?1267562148"
