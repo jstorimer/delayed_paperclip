@@ -40,9 +40,6 @@ module DelayedPaperclip
         self.job_is_processing = true
         reprocess!
         self.job_is_processing = false
-        #Required - Now that updated_at has been modified in reprocess this may change the url after being processed again after initial create
-        # -> Updates timestamps where available and ensures URLs match new files
-        instance.save
       end
 
       def post_process_styles_with_processing(*args)
