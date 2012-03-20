@@ -7,7 +7,6 @@ module DelayedPaperclip
       base.alias_method_chain :post_processing, :delay
       base.alias_method_chain :post_processing=, :delay
       base.alias_method_chain :save, :prepare_enqueueing
-      base.alias_method_chain :most_appropriate_url, :processed
       base.alias_method_chain :post_process_styles, :processing
     end
 
@@ -46,12 +45,10 @@ module DelayedPaperclip
       def post_process_styles_with_processing(*args)
         post_process_styles_without_processing(*args)
 
-        # update_column is available in rails 3.1 instead we can do this to update the attribute without callbacks
-
-        #instance.update_column("#{name}_processing", false) if instance.respond_to?(:"#{name}_processing?")
         if instance.respond_to?(:"#{name}_processing?")
           instance.send("#{name}_processing=", false)
-          instance.class.update_all({ "#{name}_processing" => false }, instance.class.primary_key => instance.id)
+
+          instance.class.update_all({ "#{name}_processing" => false, "#{name}_updated_at" => Time.at(self.updated_at) }, instance.class.primary_key => instance.id)
         end
       end
 
@@ -64,14 +61,6 @@ module DelayedPaperclip
         end
       end
 
-      def most_appropriate_url_with_processed
-        if original_filename.nil? || delayed_default_url?
-          default_url
-        else
-          @options.url
-        end
-      end
-
       def delayed_default_url?
         !(job_is_processing || dirty? || !delayed_options.try(:[], :url_with_processing) || !(@instance.respond_to?(:"#{name}_processing?") && processing?))
       end
@@ -79,3 +68,5 @@ module DelayedPaperclip
     end
   end
 end
+
+

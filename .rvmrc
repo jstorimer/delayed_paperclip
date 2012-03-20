@@ -1,1 +1,6 @@
-rvm gemset use delayed_paperclip --create
+if [[ `rvm list` == *ruby-1.9.3-p125-perf* ]]; then
+  rvm ruby-1.9.3-p125-perf@delayed_paperclip --create
+else
+  rvm 1.9.3-p123@delayed_paperclip --create
+fi
+
