@@ -45,12 +45,10 @@ module DelayedPaperclip
       def post_process_styles_with_processing(*args)
         post_process_styles_without_processing(*args)
 
-        # update_column is available in rails 3.1 instead we can do this to update the attribute without callbacks
-
-        #instance.update_column("#{name}_processing", false) if instance.respond_to?(:"#{name}_processing?")
         if instance.respond_to?(:"#{name}_processing?")
           instance.send("#{name}_processing=", false)
-          instance.class.update_all({ "#{name}_processing" => false }, instance.class.primary_key => instance.id)
+
+          instance.class.update_all({ "#{name}_processing" => false, "#{name}_updated_at" => Time.at(self.updated_at) }, instance.class.primary_key => instance.id)
         end
       end
 
