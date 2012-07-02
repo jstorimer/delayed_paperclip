@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 gemspec
 
-gem "paperclip", '2.4.5'
+gem "paperclip", '2.5.0'
 
 gem "appraisal"
 gem "mocha"
