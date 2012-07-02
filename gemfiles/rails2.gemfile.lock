@@ -1,7 +1,7 @@
 PATH
   remote: /Users/tom/Development/Projects/delayed_paperclip
   specs:
-    delayed_paperclip (2.4.5.1)
+    delayed_paperclip (2.4.5.2)
       paperclip (>= 2.4.5)
 
 GEM
@@ -70,7 +70,7 @@ DEPENDENCIES
   delayed_paperclip!
   json
   mocha
-  paperclip (~> 2.7)
+  paperclip
   rails (~> 2.3.14)
   resque
   sqlite3

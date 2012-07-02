@@ -70,6 +70,16 @@ module BaseDelayedPaperclipTest
     assert !dummy.image_processing?, "Image should no longer be processing"
   end
 
+  def test_post_processing_value_updated_for_reprocessing
+    Paperclip::Attachment.any_instance.expects(:post_processing=).with(true)
+    Paperclip::Attachment.any_instance.expects(:post_processing=).with(false)
+
+    dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
+    dummy.save!
+    process_jobs
+    assert !dummy.image.post_processing
+  end
+
   def test_unprocessed_image_returns_missing_url
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
