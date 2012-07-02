@@ -42,7 +42,7 @@ module DelayedPaperclip
 
         reprocess!
 
-        self.post_processing = false
+        #self.post_processing = false
         self.job_is_processing = false
       end
 
