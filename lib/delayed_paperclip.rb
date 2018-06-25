@@ -69,7 +69,7 @@ module DelayedPaperclip
       unless @_enqued_for_processing_with_processing.blank? # catches nil and empy arrays
         updates = @_enqued_for_processing_with_processing.collect{|n| "#{n}_processing = :true" }.join(", ")
         updates = ActiveRecord::Base.send(:sanitize_sql_array, [updates, {:true => true}])
-        self.class.update_all(updates, "id = #{self.id}")
+        self.class.where(id: id).update_all(updates)
       end
     end
 
