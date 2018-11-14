@@ -22,7 +22,7 @@ module DelayedPaperclip
       end
 
       def delayed_options
-        @instance.class.attachment_definitions[@name][:delayed]
+        instance.class.attachment_definitions[name][:delayed]
       end
 
       def delay_processing?
@@ -34,7 +34,7 @@ module DelayedPaperclip
       end
 
       def processing?
-        @instance.send(:"#{@name}_processing?")
+        instance.send(:"#{name}_processing?")
       end
 
       def process_delayed!
@@ -56,11 +56,9 @@ module DelayedPaperclip
       end
 
       def save_with_prepare_enqueueing
-        @was_dirty = @dirty
+        was_dirty = dirty?
         save_without_prepare_enqueueing.tap do
-          if delay_processing? && @was_dirty
-            instance.prepare_enqueueing_for name
-          end
+          instance.prepare_enqueueing_for(name) if delay_processing? && was_dirty
         end
       end
 
@@ -68,14 +66,14 @@ module DelayedPaperclip
         if original_filename.nil? || delayed_default_url?
           default_url
         else
-          @options.url
+          options.url
         end
       end
 
       def delayed_default_url?
-        !(job_is_processing || dirty? || !delayed_options.try(:[], :url_with_processing) || !(@instance.respond_to?(:"#{name}_processing?") && processing?))
+        !(job_is_processing || dirty? || !delayed_options.try(:[], :url_with_processing) ||
+          !(instance.respond_to?(:"#{name}_processing?") && processing?))
       end
-
     end
   end
 end
