@@ -1,11 +1,3 @@
-
-include_files = ["README*", "LICENSE", "Rakefile", "init.rb", "{lib,tasks,test,rails,generators,shoulda_macros}/**/*"].map do |glob|
-  Dir[glob]
-end.flatten
-exclude_files = ["**/*.rbc", "test/s3.yml", "test/debug.log", "test/paperclip.db", "test/doc", "test/doc/*", "test/pkg", "test/pkg/*", "test/tmp", "test/tmp/*"].map do |glob|
-  Dir[glob]
-end.flatten
-
 spec = Gem::Specification.new do |s|
   s.name        = %q{delayed_paperclip}
   s.version     = "2.4.5.1"
@@ -16,9 +8,11 @@ spec = Gem::Specification.new do |s|
   s.email       = %q{jesse@jstorimer.com}
   s.homepage    = %q{http://github.com/jstorimer/delayed_paperclip}
 
-  s.files             = include_files - exclude_files
+  s.required_ruby_version = ">= 2.0.0"
 
-  s.test_files        = Dir["test/**/*,rb"] + Dir['test/features/*']
+  git_files = `git ls-files -z`.split("\x0")
+  s.files       = git_files.reject { |f| f.match(%r{^(gemfiles|test)/}) }
+  s.test_files  = git_files.select { |f| f.match(%r{^(gemfiles|test)/}) }
 
   s.add_dependency 'paperclip', [">= 2.2.9"]
 

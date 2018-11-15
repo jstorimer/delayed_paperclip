@@ -10,8 +10,8 @@ module DelayedPaperclip
     end
 
     def self.insert
-      ActiveRecord::Base.send(:include, DelayedPaperclip::Glue)
-      Paperclip::Attachment.send(:include, DelayedPaperclip::Attachment)
+      ActiveRecord::Base.extend DelayedPaperclip::ClassMethods
+      Paperclip::Attachment.prepend DelayedPaperclip::Attachment
     end
   end
 end
