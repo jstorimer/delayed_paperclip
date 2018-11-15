@@ -50,7 +50,7 @@ module DelayedPaperclip
         attachment_definitions[name][:delayed][option] = options.key?(option) ? options[option] : default
       end
 
-      if respond_to?(:after_commit) && (!defined?(Rails) || !Rails.env.test?)
+      if respond_to?(:after_commit)
         after_commit  :enqueue_delayed_processing
       else
         after_save  :enqueue_delayed_processing
