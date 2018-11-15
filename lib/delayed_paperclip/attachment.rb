@@ -56,9 +56,9 @@ module DelayedPaperclip
       end
 
       def save_with_prepare_enqueueing
-        was_dirty = @dirty
+        @was_dirty = @dirty
         save_without_prepare_enqueueing.tap do
-          if delay_processing? && was_dirty
+          if delay_processing? && @was_dirty
             instance.prepare_enqueueing_for name
           end
         end

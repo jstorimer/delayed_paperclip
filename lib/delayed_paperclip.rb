@@ -1,11 +1,9 @@
 require 'delayed_paperclip/jobs'
 require 'delayed_paperclip/attachment'
-require 'delayed_paperclip/railtie'
+require 'delayed_paperclip/railtie' if defined?(Rails)
 
 module DelayedPaperclip
-
   class << self
-
     def options
       @options ||= {
         :background_job_class => detect_background_task,
@@ -16,22 +14,22 @@ module DelayedPaperclip
     def detect_background_task
       return DelayedPaperclip::Jobs::DelayedJob if defined? ::Delayed::Job
       return DelayedPaperclip::Jobs::Resque     if defined? ::Resque
+      return DelayedPaperclip::Jobs::Sidekiq    if defined? ::Sidekiq
     end
 
     def processor
       options[:background_job_class]
     end
 
-    def enqueue(instance_klass, instance_id, attachment_name)
-      processor.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name)
+    def enqueue(instance_klass, instance_id, attachment_name, priority)
+      processor.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name, priority)
     end
 
     def process_job(instance_klass, instance_id, attachment_name)
-      instance_klass.constantize.find(instance_id).
-        send(attachment_name).
-        process_delayed!
+      instance = instance_klass.constantize.find_by_id(instance_id)
+      return unless instance
+      instance.send(attachment_name).process_delayed!
     end
-
   end
 
   module Glue
@@ -41,7 +39,6 @@ module DelayedPaperclip
   end
 
   module ClassMethods
-
     def process_in_background(name, options = {})
       include InstanceMethods
 
@@ -62,6 +59,18 @@ module DelayedPaperclip
   end
 
   module InstanceMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def create_immediately_processing(attributes = nil)
+        new.tap { |object|
+          object.each_attachment do |name, attachment|
+            attachment.post_processing = true
+          end
+          object.attributes = attributes if attributes
+        }.tap(&:save)
+      end
+    end
 
     # setting each inididual NAME_processing to true, skipping the ActiveModel dirty setter
     # Then immediately push the state to the database
@@ -85,7 +94,7 @@ module DelayedPaperclip
     end
 
     def enqueue_post_processing_for name
-      DelayedPaperclip.enqueue(self.class.name, read_attribute(:id), name.to_sym)
+      DelayedPaperclip.enqueue(self.class.name, read_attribute(:id), name.to_sym, self.priority)
     end
 
     def prepare_enqueueing_for name
@@ -97,6 +106,5 @@ module DelayedPaperclip
       @_enqued_for_processing ||= []
       @_enqued_for_processing << name
     end
-
   end
 end

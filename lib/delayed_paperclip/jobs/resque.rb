@@ -5,7 +5,7 @@ module DelayedPaperclip
     class Resque
       @queue = :paperclip
 
-      def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name)
+      def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name, priority)
         ::Resque.enqueue(self, instance_klass, instance_id, attachment_name)
       end
 

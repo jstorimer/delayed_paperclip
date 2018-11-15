@@ -20,11 +20,12 @@ spec = Gem::Specification.new do |s|
 
   s.test_files        = Dir["test/**/*,rb"] + Dir['test/features/*']
 
-  s.add_dependency 'paperclip', [">= 2.4.5"]
+  s.add_dependency 'paperclip', [">= 2.2.9"]
 
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'delayed_job'
   s.add_development_dependency 'resque'
+  s.add_development_dependency 'sidekiq'
 end
 

@@ -6,7 +6,7 @@ module DelayedPaperclip
 
       if false && defined?(::Delayed::DeserializationError) # this is available in newer versions of DelayedJob. Using the newee Job api thus.
 
-        def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name)
+        def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name, priority)
           ::Delayed::Job.enqueue(
             :payload_object => new(instance_klass, instance_id, attachment_name),
             :priority => instance_klass.constantize.attachment_definitions[attachment_name][:delayed][:priority].to_i
@@ -15,7 +15,7 @@ module DelayedPaperclip
 
       else
 
-        def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name)
+        def self.enqueue_delayed_paperclip(instance_klass, instance_id, attachment_name, priority)
           ::Delayed::Job.enqueue(
             new(instance_klass, instance_id, attachment_name),
             instance_klass.constantize.attachment_definitions[attachment_name][:delayed][:priority].to_i
