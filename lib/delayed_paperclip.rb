@@ -32,12 +32,6 @@ module DelayedPaperclip
     end
   end
 
-  module Glue
-    def self.included base #:nodoc:
-      base.extend(ClassMethods)
-    end
-  end
-
   module ClassMethods
     def process_in_background(name, options = {})
       include InstanceMethods
