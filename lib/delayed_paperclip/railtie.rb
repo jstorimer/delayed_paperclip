@@ -11,7 +11,7 @@ module DelayedPaperclip
 
     def self.insert
       ActiveRecord::Base.extend DelayedPaperclip::ClassMethods
-      Paperclip::Attachment.send(:include, DelayedPaperclip::Attachment)
+      Paperclip::Attachment.prepend DelayedPaperclip::Attachment
     end
   end
 end

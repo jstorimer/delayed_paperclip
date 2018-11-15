@@ -1,20 +1,12 @@
 module DelayedPaperclip
   module Attachment
-    def self.included(base)
-      base.alias_method_chain :post_processing, :delay
-      base.alias_method_chain :post_processing=, :delay
-      base.alias_method_chain :save, :prepare_enqueueing
-      base.alias_method_chain :most_appropriate_url, :processed
-      base.alias_method_chain :post_process_styles, :processing
-    end
-
     attr_accessor :job_is_processing
 
-    def post_processing_with_delay
+    def post_processing
       !delay_processing?
     end
 
-    def post_processing_with_delay=(value)
+    def post_processing=(value)
       @post_processing_with_delay = value
     end
 
@@ -40,8 +32,8 @@ module DelayedPaperclip
       self.job_is_processing = false
     end
 
-    def post_process_styles_with_processing(*args)
-      post_process_styles_without_processing(*args)
+    def post_process_styles(*)
+      super
 
       # update_column is available in rails 3.1 instead we can do this to update the attribute without callbacks
 
@@ -52,14 +44,14 @@ module DelayedPaperclip
       end
     end
 
-    def save_with_prepare_enqueueing
+    def save
       was_dirty = dirty?
-      save_without_prepare_enqueueing.tap do
+      super.tap do
         instance.prepare_enqueueing_for(name) if delay_processing? && was_dirty
       end
     end
 
-    def most_appropriate_url_with_processed
+    def most_appropriate_url
       if original_filename.nil? || delayed_default_url?
         default_url
       else
