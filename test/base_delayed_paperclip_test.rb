@@ -49,9 +49,7 @@ module BaseDelayedPaperclipTest
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
     assert dummy.image_processing?
-    assert_raise('oops') do
-      process_jobs
-    end
+    process_jobs rescue nil # some adapters raise, some don't
     assert dummy.image_processing?
     assert dummy.reload.image_processing?
   end

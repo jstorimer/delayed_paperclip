@@ -144,7 +144,7 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
     rake (13.0.6)
-    redis (4.6.0)
+    redis (4.5.1)
     redis-namespace (1.8.2)
       redis (>= 3.0.4)
     resque (2.2.1)
@@ -192,6 +192,7 @@ DEPENDENCIES
   mocha
   paperclip!
   rails (~> 6.1.0)
+  redis (~> 4.5.1)
   resque
   sidekiq
   sqlite3

@@ -11,6 +11,19 @@ $LOAD_PATH << File.join(ROOT, 'lib')
 ENV['RAILS_ENV'] = 'test'
 ENV['RAILS_ROOT'] = RAILS_ROOT
 
+# ignore warnings in libs themselves for ruby 2.7
+if defined?(Warning)
+  module WarningFilter
+    def warn(msg)
+      return if msg.include?('/lib/delayed/worker.rb:')
+      return if msg.include?('/lib/resque.rb:')
+      return if msg.include?('/lib/paperclip/') && !ENV['LOCAL_PAPERCLIP']
+      super
+    end
+  end
+  Warning.singleton_class.prepend(WarningFilter)
+end
+
 require 'rails'
 require 'active_record'
 require 'logger'
@@ -88,3 +101,4 @@ def reset_class(class_name, options)
   klass.reset_column_information
   klass
 end
+
