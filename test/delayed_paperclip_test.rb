@@ -2,9 +2,9 @@ require 'test_helper'
 require 'base_delayed_paperclip_test'
 require 'delayed_job'
 
-Delayed::Worker.backend = :active_record
+Delayed::Worker.backend = :active_record if Delayed::Worker.respond_to?(:backend=)
 
-class DelayedPaperclipTest < Test::Unit::TestCase
+class DelayedPaperclipTest < DelayedPaperclip::TestCase
   include BaseDelayedPaperclipTest
 
   def setup
