@@ -15,7 +15,7 @@ module DelayedPaperclip
     end
 
     def delay_processing?
-      if @post_processing_with_delay.nil?
+      if !defined?(@post_processing_with_delay) || @post_processing_with_delay.nil?
         !!delayed_options
       else
         !@post_processing_with_delay

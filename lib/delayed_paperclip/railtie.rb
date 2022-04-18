@@ -1,8 +1,5 @@
-require 'paperclip'
-require 'delayed_paperclip'
-
 module DelayedPaperclip
-  class Railtie < Rails::Railtie
+  class Railtie < ::Rails::Railtie
     initializer 'delayed_paperclip.insert_into_active_record' do
       ActiveSupport.on_load :active_record do
         DelayedPaperclip::Railtie.insert
