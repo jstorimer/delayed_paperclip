@@ -1,24 +1,24 @@
 require 'test_helper'
 require 'base_delayed_paperclip_test'
-require 'resque'
+require 'sidekiq'
+require 'sidekiq/testing'
 
-class ResquePaperclipTest < DelayedPaperclip::TestCase
+class SidekiqPaperclipTest < DelayedPaperclip::TestCase
   include BaseDelayedPaperclipTest
 
   def setup
     super
-    # Make sure that we just test Resque in here
-    DelayedPaperclip.options[:background_job_class] = DelayedPaperclip::Jobs::Resque
-    Resque.remove_queue(:paperclip)
+    DelayedPaperclip.options[:background_job_class] = DelayedPaperclip::Jobs::Sidekiq
+    Sidekiq::Worker.clear_all
+    Sidekiq.strict_args!
   end
 
   def process_jobs
-    worker = Resque::Worker.new(:paperclip)
-    worker.process
+    Sidekiq::Worker.drain_all
   end
 
   def jobs_count
-    Resque.size(:paperclip)
+    DelayedPaperclip::Jobs::Sidekiq.jobs.size
   end
 
   def test_perform_job
@@ -26,7 +26,7 @@ class ResquePaperclipTest < DelayedPaperclip::TestCase
     dummy.image = File.open("#{RAILS_ROOT}/test/fixtures/12k.png")
     Paperclip::Attachment.any_instance.expects(:reprocess!)
     dummy.save!
-    DelayedPaperclip::Jobs::Resque.perform(dummy.class.name, dummy.id, :image)
+    assert_equal 1, jobs_count
+    process_jobs
   end
-
 end

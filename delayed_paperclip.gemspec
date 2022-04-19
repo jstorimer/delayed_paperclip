@@ -8,7 +8,7 @@ spec = Gem::Specification.new do |s|
   s.email       = %q{jesse@jstorimer.com}
   s.homepage    = %q{http://github.com/jstorimer/delayed_paperclip}
 
-  s.required_ruby_version = ">= 2.0.0"
+  s.required_ruby_version = ">= 2.3.0"
 
   git_files = `git ls-files -z`.split("\x0")
   s.files       = git_files.reject { |f| f.match(%r{^(gemfiles|test)/}) }
@@ -16,10 +16,8 @@ spec = Gem::Specification.new do |s|
 
   s.add_dependency 'paperclip', [">= 2.2.9"]
 
+  s.add_development_dependency 'appraisal'
+  s.add_development_dependency 'test-unit'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'delayed_job'
-  s.add_development_dependency 'resque'
-  s.add_development_dependency 'sidekiq'
 end
-

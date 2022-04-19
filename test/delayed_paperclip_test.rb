@@ -1,10 +1,23 @@
+require 'stringio'
 require 'test_helper'
 require 'base_delayed_paperclip_test'
-require 'delayed_job'
 
-Delayed::Worker.backend = :active_record
+def silent_warnings
+  old_stderr = $stderr
+  $stderr = StringIO.new
+  yield
+ensure
+  $stderr = old_stderr
+end
 
-class DelayedPaperclipTest < Test::Unit::TestCase
+# delayed_job itself is pretty noisy at the moment, ignore these
+silent_warnings do
+  require 'delayed_job'
+end
+
+Delayed::Worker.backend = :active_record if Delayed::Worker.respond_to?(:backend=)
+
+class DelayedPaperclipTest < DelayedPaperclip::TestCase
   include BaseDelayedPaperclipTest
 
   def setup
@@ -39,6 +52,7 @@ class DelayedPaperclipTest < Test::Unit::TestCase
       table.datetime :locked_at                    # Set when a client is working on this object
       table.datetime :failed_at                    # Set when all retries have failed (actually, by default, the record is deleted instead)
       table.string   :locked_by                    # Who is working on this object (if locked)
+      table.string   :queue
       table.timestamps
     end
   end

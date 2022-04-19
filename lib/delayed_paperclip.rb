@@ -69,29 +69,34 @@ module DelayedPaperclip
     # setting each inididual NAME_processing to true, skipping the ActiveModel dirty setter
     # Then immediately push the state to the database
     def mark_enqueue_delayed_processing
-      unless @_enqued_for_processing_with_processing.blank? # catches nil and empy arrays
-        updates = @_enqued_for_processing_with_processing.collect{|n| "#{n}_processing = :true" }.join(", ")
-        updates = ActiveRecord::Base.send(:sanitize_sql_array, [updates, {:true => true}])
-        self.class.where(id: id).update_all(updates)
-      end
+      return unless defined?(@_enqued_for_processing_with_processing)
+      return if @_enqued_for_processing_with_processing.blank? # catches nil and empy arrays
+
+      updates = @_enqued_for_processing_with_processing.collect{|n| "#{n}_processing = :true" }.join(", ")
+      updates = ActiveRecord::Base.send(:sanitize_sql_array, [updates, {:true => true}])
+      self.class.where(id: id).update_all(updates)
     end
 
     # First mark processing
     # then create
     def enqueue_delayed_processing
       mark_enqueue_delayed_processing
-      (@_enqued_for_processing || []).each do |name|
+      @_enqued_for_processing ||= []
+      @_enqued_for_processing.each do |name|
         enqueue_post_processing_for(name)
       end
       @_enqued_for_processing_with_processing = []
-      @_enqued_for_processing = []
+      @_enqued_for_processing.clear
     end
 
-    def enqueue_post_processing_for name
-      DelayedPaperclip.enqueue(self.class.name, read_attribute(:id), name.to_sym, self.priority)
+    def enqueue_post_processing_for(name)
+      # как это вообще работало? ведь нет метода self.priority
+      priority = nil
+      priority = self.priority if respond_to?(:priority)
+      DelayedPaperclip.enqueue(self.class.name, read_attribute(:id), name.to_sym, priority)
     end
 
-    def prepare_enqueueing_for name
+    def prepare_enqueueing_for(name)
       if self.attributes.has_key? "#{name}_processing"
         write_attribute("#{name}_processing", true)
         @_enqued_for_processing_with_processing ||= []

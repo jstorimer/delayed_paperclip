@@ -12,7 +12,7 @@ module BaseDelayedPaperclipTest
     assert !dummy.image.delay_processing?
     assert dummy.image.post_processing
     assert dummy.save
-    assert File.exists?(dummy.image.path)
+    assert File.exist?(dummy.image.path)
   end
 
   def test_normal_explisit_post_processing_with_delayed_paperclip
@@ -22,7 +22,7 @@ module BaseDelayedPaperclipTest
     assert !dummy.image.delay_processing?
     assert dummy.image.post_processing, "Post processing should return true"
     assert dummy.save
-    assert File.exists?(dummy.image.path)
+    assert File.exist?(dummy.image.path)
   end
 
   def test_delayed_paperclip_functioning
@@ -33,7 +33,7 @@ module BaseDelayedPaperclipTest
     assert dummy.image.delay_processing?
     assert !dummy.image.post_processing
     assert dummy.save
-    assert File.exists?(dummy.image.path), "Path #{dummy.image.path} should exist"
+    assert File.exist?(dummy.image.path), "Path #{dummy.image.path} should exist"
   end
 
   def test_enqueue_job_if_source_changed
@@ -49,7 +49,7 @@ module BaseDelayedPaperclipTest
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
     assert dummy.image_processing?
-    process_jobs
+    process_jobs rescue nil # some adapters raise, some don't
     assert dummy.image_processing?
     assert dummy.reload.image_processing?
   end
@@ -76,7 +76,7 @@ module BaseDelayedPaperclipTest
     assert_equal "/images/original/missing.png", dummy.image.url(:original, :timestamp => false)
     process_jobs
     dummy.reload
-    assert_match /\/system\/images\/1\/original\/12k.png/, dummy.image.url
+    assert_match(%r{/system/images/1/original/12k.png}, dummy.image.url)
   end
 
   def test_unprocessed_image_not_returning_missing_url_if_turrned_of_globally
@@ -84,27 +84,27 @@ module BaseDelayedPaperclipTest
     reset_dummy :with_processed => false
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
-    assert_match /\/system\/images\/1\/original\/12k.png/, dummy.image.url
+    assert_match %r{/system/images/1/original/12k.png}, dummy.image.url
     process_jobs
     dummy.reload
-    assert_match /\/system\/images\/1\/original\/12k.png/, dummy.image.url
+    assert_match %r{/system/images/1/original/12k.png}, dummy.image.url
   end
 
   def test_unprocessed_image_not_returning_missing_url_if_turrned_of_on_instance
     reset_dummy :with_processed => false, :url_with_processing => false
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
-    assert_match(/\/system\/images\/1\/original\/12k.png/, dummy.image.url)
+    assert_match(%r{/system/images/1/original/12k.png}, dummy.image.url)
     process_jobs
     dummy.reload
-    assert_match(/\/system\/images\/1\/original\/12k.png/, dummy.image.url)
+    assert_match(%r{/system/images/1/original/12k.png}, dummy.image.url)
   end
 
   def test_original_url_when_no_processing_column
     reset_dummy :with_processed => false
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
-    assert_match(/\/system\/images\/1\/original\/12k.png/, dummy.image.url)
+    assert_match(%r{/system/images/1/original/12k.png}, dummy.image.url)
   end
 
   def test_original_url_if_image_changed
@@ -114,13 +114,13 @@ module BaseDelayedPaperclipTest
     dummy.save!
     assert_equal '/images/original/missing.png', dummy.image.url(:original, :timestamp => false)
     process_jobs
-    assert_match(/system\/images\/.*original.*/, dummy.reload.image.url)
+    assert_match(%r{system/images/.*original.*}, dummy.reload.image.url)
   end
 
   def test_missing_url_if_image_hasnt_changed
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
-    assert_match(/images\/.*missing.*/, dummy.image.url)
+    assert_match(%r{images/.*missing.*}, dummy.image.url)
   end
 
   def test_should_not_blow_up_if_dsl_unused
@@ -144,7 +144,7 @@ module BaseDelayedPaperclipTest
     dummy = Dummy.new(:image => File.open("#{RAILS_ROOT}/test/fixtures/12k.png"))
     dummy.save!
     process_jobs
-    dummy.update_attributes(:name => "hi")
+    dummy.update!(name: "hi")
   end
 
 end
